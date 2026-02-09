@@ -42,8 +42,8 @@ const VendorPortal = ({ onUploadClick }) => {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'PAID': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-            case 'VERIFIED':
+            case 'PAID':
+            case 'VERIFIED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
             case 'APPROVED': return 'text-blue-600 bg-blue-50 border-blue-100';
             case 'REJECTED': return 'text-rose-600 bg-rose-50 border-rose-100';
             case 'DIGITIZING':

@@ -75,7 +75,7 @@ const FinanceUserDashboard = ({ invoices, onUploadComplete }) => {
                             <div>
                                 <h3 className="font-bold text-lg text-slate-800">Recent Invoice Activity</h3>
                             </div>
-                            <button onClick={() => router.push('/search')} className="text-xs font-bold text-primary hover:underline">
+                            <button onClick={() => router.push('/digitization')} className="text-xs font-bold text-primary hover:underline">
                                 View All History
                             </button>
                         </div>
@@ -113,7 +113,7 @@ const FinanceUserDashboard = ({ invoices, onUploadComplete }) => {
                                                 </td>
                                                 <td>
                                                     <span className={`badge badge-sm border-0 font-bold py-3 px-3 uppercase text-[10px] tracking-wide
-                                                        ${inv.status === 'APPROVED' ? 'bg-success/10 text-success' :
+                                                        ${inv.status === 'APPROVED' || inv.status === 'VERIFIED' ? 'bg-success/10 text-success' :
                                                             inv.status === 'MATCH_DISCREPANCY' ? 'bg-error/10 text-error' :
                                                                 inv.status === 'VALIDATION_REQUIRED' ? 'bg-info/10 text-info' :
                                                                     inv.status === 'PENDING_APPROVAL' ? 'bg-warning/10 text-warning' :
