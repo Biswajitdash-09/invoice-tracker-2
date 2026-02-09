@@ -227,7 +227,7 @@ export default function DashboardPage() {
       ) : user?.role === ROLES.FINANCE_USER ? (
         <FinanceUserDashboard invoices={invoices} onUploadComplete={handleUploadComplete} />
       ) : user?.role === ROLES.PROJECT_MANAGER ? (
-        <ProjectManagerDashboard user={user} />
+        <ProjectManagerDashboard user={user} invoices={invoices} />
       ) : (
         <>
           {activeTab === 'analytics' ? (

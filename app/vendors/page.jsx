@@ -22,6 +22,7 @@ export default function VendorPortal() {
         const thisFetchId = ++fetchIdRef.current;
         try {
             const data = await getAllInvoices();
+            // If component unmounted or new fetch started, ignore result
             if (thisFetchId !== fetchIdRef.current) return;
             setAllSubmissions(Array.isArray(data) ? data : []);
         } catch (e) {
@@ -84,9 +85,16 @@ export default function VendorPortal() {
             router.push("/login");
             return;
         }
-        fetchSubmissions();
-        const interval = setInterval(fetchSubmissions, 2000);
-        return () => clearInterval(interval);
+
+        let timeoutId;
+        const poll = async () => {
+            await fetchSubmissions();
+            // Schedule next poll only after current one finishes
+            timeoutId = setTimeout(poll, 15000); // 15 seconds
+        };
+
+        poll();
+        return () => clearTimeout(timeoutId);
     }, [user, authLoading, router, fetchSubmissions]);
 
     const stats = useMemo(() => {

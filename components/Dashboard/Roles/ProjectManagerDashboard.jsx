@@ -7,23 +7,11 @@ import Card from "@/components/ui/Card";
 import Icon from "@/components/Icon";
 import { formatCurrency } from "@/utils/format";
 
-export default function ProjectManagerDashboard({ user }) {
-    const [invoices, setInvoices] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default function ProjectManagerDashboard({ user, invoices = [] }) {
+    // const [invoices, setInvoices] = useState([]); // REMOVED: Using props
+    // const [loading, setLoading] = useState(true); // REMOVED: Managed by parent
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getAllInvoices();
-                setInvoices(data);
-            } catch (error) {
-                console.error("Failed to load invoices", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+    // useEffect(() => { ... }, []); // REMOVED: Data fetching lifted to parent
 
     // Filter Logic for PM
     const pendingApprovals = invoices.filter(inv => inv.status === 'PENDING_APPROVAL');
