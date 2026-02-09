@@ -62,13 +62,7 @@ export default function PageHeader({ title, subtitle, icon = "LayoutDashboard", 
 
         {user && (
           <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-800">{user.name}</p>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize ${badgeClass}`}>
-                  {displayRole}
-                </span>
-              </div>
+            <label tabIndex={0} className="cursor-pointer hover:opacity-90 transition-opacity" title={user.name}>
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientClass} shadow-md flex items-center justify-center text-white font-bold uppercase`}>
                 {user.name?.charAt(0) || "U"}
               </div>

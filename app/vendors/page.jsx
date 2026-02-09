@@ -402,17 +402,12 @@ export default function VendorPortal() {
 
             {/* Submissions Intelligence - previous dark header table */}
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
-                            <Icon name="Activity" size={18} />
-                        </div>
-                        Submissions Intelligence
-                    </h2>
-                    <button type="button" className="text-teal-600 font-black text-xs uppercase tracking-widest hover:underline transition-all">
-                        History Vault
-                    </button>
-                </div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                        <Icon name="Activity" size={18} />
+                    </div>
+                    Submissions Intelligence
+                </h2>
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -499,11 +494,7 @@ export default function VendorPortal() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-center">
-                        <button type="button" className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-teal-600 transition-all flex items-center gap-2">
-                            Load Secure History <Icon name="ChevronDown" size={14} />
-                        </button>
-                    </div>
+
                 </div>
             </div>
 
