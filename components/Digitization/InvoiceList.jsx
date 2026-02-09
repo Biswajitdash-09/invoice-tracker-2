@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Icon from "@/components/Icon";
 
-const InvoiceList = ({ invoices }) => {
+const InvoiceList = ({ invoices, viewMode = 'list' }) => {
   if (!invoices || invoices.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-gray-400 bg-white/20 rounded-2xl border border-white/40 backdrop-blur-md">
@@ -14,31 +14,26 @@ const InvoiceList = ({ invoices }) => {
     );
   }
 
-  // Filter only relevant statuses for this view if needed, but the prompt implies listing items pending digitization.
-  // We'll display all, but emphasize those needing action.
-
   const getStatusColor = (status) => {
-    // Normalize status to handle both "VERIFIED" and "Verified"
     const normalized = status?.toUpperCase() || "";
-
     switch (normalized) {
       case 'APPROVED':
       case 'PAID':
-        return 'bg-success/10 text-success border-success/20'; // Green
+        return 'bg-success/10 text-success border-success/20';
       case 'PENDING_APPROVAL':
       case 'PENDING APPROVAL':
-        return 'bg-warning/10 text-warning border-warning/20'; // Yellow
+        return 'bg-warning/10 text-warning border-warning/20';
       case 'ISSUE_DETECTED':
       case 'VALIDATION_REQUIRED':
       case 'REJECTED':
-        return 'bg-error/10 text-error border-error/20'; // Red
+        return 'bg-error/10 text-error border-error/20';
       case 'PROCESSING':
-        return 'bg-info/10 text-info border-info/20'; // Blue
+        return 'bg-info/10 text-info border-info/20';
       case 'VERIFIED':
-        return 'bg-success/10 text-success border-success/20'; // Green (Requested)
+        return 'bg-success/10 text-success border-success/20';
       case 'MATCH_DISCREPANCY':
       case 'MATCH DISCREPANCY':
-        return 'bg-orange-50 text-orange-600 border-orange-200'; // Orange (Requested)
+        return 'bg-orange-50 text-orange-600 border-orange-200';
       case 'DIGITIZED':
         return 'bg-green-500/10 text-green-600 border-green-500/20';
       case 'DIGITIZING':
@@ -50,7 +45,6 @@ const InvoiceList = ({ invoices }) => {
 
   const getStatusIcon = (status) => {
     const normalized = status?.toUpperCase() || "";
-
     switch (normalized) {
       case 'APPROVED':
       case 'PAID':
@@ -77,14 +71,75 @@ const InvoiceList = ({ invoices }) => {
     }
   };
 
+  if (viewMode === 'grid') {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {invoices.map((invoice, index) => (
+          <motion.div
+            key={invoice.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.05 }}
+            className="group glass-panel rounded-3xl p-6 hover:shadow-xl transition-all duration-300 border border-white/40 flex flex-col h-full bg-white/40 hover:bg-white/60"
+          >
+            <div className="flex justify-between items-start mb-6">
+              <div className={`p-3 rounded-2xl ${getStatusColor(invoice.status)} shadow-sm`}>
+                <Icon name={getStatusIcon(invoice.status)} size={24} />
+              </div>
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${getStatusColor(invoice.status)}`}>
+                {invoice.status?.replace('_', ' ')}
+              </span>
+            </div>
+
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="font-black text-slate-800 text-lg sm:text-xl leading-tight group-hover:text-primary transition-colors truncate" title={invoice.vendorName}>
+                  {invoice.vendorName || "Unknown Vendor"}
+                </h3>
+                <p className="text-xs font-mono font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                  ID: {invoice.id?.substring(0, 12)}...
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-100/50">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Amount</span>
+                  <span className="text-sm font-black text-slate-700">
+                    {isNaN(Number(invoice.amount)) || !invoice.amount
+                      ? '₹0.00'
+                      : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(invoice.amount)}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Date</span>
+                  <span className="text-sm font-bold text-slate-600 flex items-center gap-1">
+                    <Icon name="Calendar" size={12} className="text-slate-400" />
+                    {invoice.date || "N/A"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Link href={`/digitization/${invoice.id}`} className="mt-6">
+              <button className="btn btn-primary w-full rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] h-12">
+                Process Invoice
+                <Icon name="ArrowRight" size={14} />
+              </button>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-12 gap-4 px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-        <div className="col-span-4 md:col-span-3">Vendor / ID</div>
-        <div className="col-span-3 md:col-span-2">Date</div>
-        <div className="col-span-2 md:col-span-2 text-right">Amount</div>
-        <div className="col-span-3 md:col-span-3 text-center">Status</div>
-        <div className="col-span-12 md:col-span-2 text-right hidden md:block">Action</div>
+      <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-white/20">
+        <div className="col-span-4 lg:col-span-3">Vendor / ID</div>
+        <div className="col-span-3 lg:col-span-2">Date</div>
+        <div className="col-span-2 lg:col-span-2 text-right">Amount</div>
+        <div className="col-span-3 lg:col-span-3 text-center">Status</div>
+        <div className="col-span-12 lg:col-span-2 text-right">Action</div>
       </div>
 
       <div className="space-y-3">
@@ -94,63 +149,49 @@ const InvoiceList = ({ invoices }) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="group relative grid grid-cols-12 gap-4 items-center p-4 rounded-xl bg-white/40 border border-white/50 shadow-sm hover:shadow-md hover:bg-white/60 transition-all duration-200"
+            className="group relative grid grid-cols-12 gap-4 items-center p-4 sm:p-5 rounded-3xl bg-white/40 border border-white/50 shadow-sm hover:shadow-xl hover:bg-white/60 transition-all duration-300"
           >
-            {/* Vendor & ID */}
-            <div className="col-span-8 md:col-span-3 flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getStatusColor(invoice.status)}`}>
-                <Icon name={getStatusIcon(invoice.status)} size={18} />
+            <div className="col-span-8 md:col-span-4 lg:col-span-3 flex items-center gap-4">
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${getStatusColor(invoice.status)} shadow-sm`}>
+                <Icon name={getStatusIcon(invoice.status)} size={20} />
               </div>
               <div className="min-w-0">
-                <h3 className="font-bold text-gray-800 truncate">{invoice.vendorName}</h3>
-                <p className="text-xs text-gray-500 font-mono">{invoice.id}</p>
+                <h3 className="font-black text-slate-800 text-sm sm:text-base truncate" title={invoice.vendorName}>
+                  {invoice.vendorName}
+                </h3>
+                <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-tighter truncate">
+                  {invoice.id}
+                </p>
               </div>
             </div>
 
-            {/* Date - Hidden on very small screens if needed, but grid handles it */}
-            <div className="col-span-4 md:col-span-2 text-sm text-gray-600">
+            <div className="hidden md:block col-span-3 lg:col-span-2 text-sm font-bold text-slate-600">
               <div className="flex items-center gap-2">
-                <Icon name="Calendar" size={14} className="text-gray-400" />
+                <Icon name="Calendar" size={14} className="text-slate-400" />
                 {invoice.date}
               </div>
             </div>
 
-            {/* Amount */}
-            <div className="col-span-4 md:col-span-2 text-right font-bold text-gray-700">
+            <div className="col-span-4 md:col-span-2 text-right font-black text-slate-700 text-sm sm:text-base">
               {isNaN(Number(invoice.amount)) || !invoice.amount
                 ? '₹0.00'
                 : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(invoice.amount)}
             </div>
 
-            {/* Status */}
-            <div className="col-span-4 md:col-span-3 flex flex-col items-center gap-1">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(invoice.status)}`}>
-                {invoice.status}
+            <div className="col-span-6 md:col-span-3 flex flex-col items-center gap-1">
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border whitespace-nowrap ${getStatusColor(invoice.status)}`}>
+                {invoice.status?.replace('_', ' ')}
               </span>
-              {invoice.validation?.errors?.length > 0 && (
-                <span className="text-[10px] text-error font-semibold">
-                  {invoice.validation.errors.length} errors found
-                </span>
-              )}
             </div>
 
-            {/* Action Button */}
-            <div className="col-span-4 md:col-span-2 flex justify-end">
-              <Link href={`/digitization/${invoice.id}`} className="w-full md:w-auto">
-                <button className="btn btn-sm btn-primary w-full md:w-auto text-white shadow-lg shadow-primary/20 rounded-lg group-hover:scale-105 transition-transform">
+            <div className="col-span-6 md:col-span-12 lg:col-span-2 flex justify-end">
+              <Link href={`/digitization/${invoice.id}`} className="w-full lg:w-auto">
+                <button className="btn btn-sm sm:btn-md btn-primary w-full lg:w-auto text-white shadow-lg shadow-primary/20 rounded-2xl font-black uppercase tracking-widest text-[9px] sm:text-[10px] group-hover:scale-105 transition-all">
                   Process
                   <Icon name="ArrowRight" size={14} />
                 </button>
               </Link>
             </div>
-
-            {/* Mobile Action Full Width Overlay (Optional) */}
-            <div className="md:hidden col-span-12 mt-2 pt-2 border-t border-gray-200/50 flex justify-end">
-              <Link href={`/digitization/${invoice.id}`} className="btn btn-sm btn-ghost text-primary w-full">
-                Process Invoice <Icon name="ArrowRight" size={14} />
-              </Link>
-            </div>
-
           </motion.div>
         ))}
       </div>

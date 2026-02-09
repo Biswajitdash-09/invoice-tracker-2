@@ -22,21 +22,34 @@ function DigitizationPageContent() {
   const [invoices, setInvoices] = useState([]);
   const [allInvoices, setAllInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('grid'); // 'list' or 'grid'
+  const [searchQuery, setSearchQuery] = useState('');
 
   const searchParams = useSearchParams();
   const statusFilter = searchParams.get('status');
+
+  const filterInvoices = (data, status, query) => {
+    let filtered = data;
+    if (status) {
+      filtered = filtered.filter(inv => inv.status === status);
+    }
+    if (query) {
+      const q = query.toLowerCase();
+      filtered = filtered.filter(inv =>
+        inv.vendorName?.toLowerCase().includes(q) ||
+        inv.invoiceNumber?.toLowerCase().includes(q) ||
+        inv.id?.toLowerCase().includes(q)
+      );
+    }
+    return filtered;
+  };
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const fetchedInvoices = await getAllInvoices();
         setAllInvoices(fetchedInvoices);
-
-        let filteredInvoices = fetchedInvoices;
-        if (statusFilter) {
-          filteredInvoices = fetchedInvoices.filter(inv => inv.status === statusFilter);
-        }
-        setInvoices(filteredInvoices);
+        setInvoices(filterInvoices(fetchedInvoices, statusFilter, searchQuery));
       } catch (e) {
         console.error("Failed to load invoices from backend", e);
       } finally {
@@ -45,24 +58,19 @@ function DigitizationPageContent() {
     };
     loadData();
 
-    // Polling for updates on "DIGITIZING" or "RECEIVED" invoices
+    // Polling for updates
     const pollInterval = setInterval(async () => {
       try {
         const remoteInvoices = await getAllInvoices();
         setAllInvoices(remoteInvoices);
-
-        let filteredRemote = remoteInvoices;
-        if (statusFilter) {
-          filteredRemote = remoteInvoices.filter(inv => inv.status === statusFilter);
-        }
-        setInvoices(filteredRemote);
+        setInvoices(filterInvoices(remoteInvoices, statusFilter, searchQuery));
       } catch (e) {
         console.error("Polling error", e);
       }
     }, 5000);
 
     return () => clearInterval(pollInterval);
-  }, [statusFilter]);
+  }, [statusFilter, searchQuery]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -78,12 +86,34 @@ function DigitizationPageContent() {
             Review, validate, and process incoming invoices. The AI pre-fills data for your verification.
           </p>
         </div>
-        <div className="flex gap-3">
-          <div className="join shadow-sm border border-white/40 rounded-lg">
-            <button className="join-item btn btn-sm bg-white/50 border-none hover:bg-white"><Icon name="List" size={18} /></button>
-            <button className="join-item btn btn-sm bg-primary text-white border-none"><Icon name="Grid" size={18} /></button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search Input */}
+          <div className="relative group">
+            <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary" />
+            <input
+              type="text"
+              placeholder="Search vendor, ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-1.5 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-48 sm:w-64 transition-all"
+            />
           </div>
-          <button className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2">
+
+          <div className="join shadow-sm border border-white/40 rounded-lg overflow-hidden h-9">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`join-item btn btn-sm border-none hover:bg-white px-3 ${viewMode === 'list' ? 'bg-primary text-white hover:bg-primary' : 'bg-white/50 text-gray-500'}`}
+            >
+              <Icon name="List" size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`join-item btn btn-sm border-none hover:bg-white px-3 ${viewMode === 'grid' ? 'bg-primary text-white hover:bg-primary' : 'bg-white/50 text-gray-500'}`}
+            >
+              <Icon name="Grid" size={18} />
+            </button>
+          </div>
+          <button className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2 h-9 px-4">
             <Icon name="Filter" size={16} /> Filter
           </button>
         </div>
@@ -91,21 +121,21 @@ function DigitizationPageContent() {
 
       {/* Stats Summary (Mini) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 flex flex-col">
-          <span className="text-xs font-bold uppercase opacity-70">To Digitize</span>
-          <span className="text-2xl font-bold text-purple-700">{allInvoices.filter(i => ['RECEIVED', 'DIGITIZING', 'UPLOADED'].includes(i.status?.toUpperCase())).length}</span>
+        <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 flex flex-col shadow-sm">
+          <span className="text-[10px] sm:text-xs font-black uppercase opacity-70 tracking-wider">To Digitize</span>
+          <span className="text-2xl font-black text-purple-700">{allInvoices.filter(i => ['RECEIVED', 'DIGITIZING', 'UPLOADED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
-        <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 flex flex-col">
-          <span className="text-xs font-bold uppercase opacity-70">Processing</span>
-          <span className="text-2xl font-bold text-blue-700">{allInvoices.filter(i => ['VERIFIED', 'MATCH_DISCREPANCY', 'VALIDATION_REQUIRED', 'ISSUE_DETECTED', 'DIGITIZED'].includes(i.status?.toUpperCase())).length}</span>
+        <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 flex flex-col shadow-sm">
+          <span className="text-[10px] sm:text-xs font-black uppercase opacity-70 tracking-wider">Processing</span>
+          <span className="text-2xl font-black text-blue-700">{allInvoices.filter(i => ['VERIFIED', 'MATCH_DISCREPANCY', 'VALIDATION_REQUIRED', 'ISSUE_DETECTED', 'DIGITIZED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
-        <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 flex flex-col">
-          <span className="text-xs font-bold uppercase opacity-70">Pending Approval</span>
-          <span className="text-2xl font-bold text-orange-700">{allInvoices.filter(i => ['PENDING_APPROVAL', 'PENDING APPROVAL'].includes(i.status?.toUpperCase())).length}</span>
+        <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 flex flex-col shadow-sm">
+          <span className="text-[10px] sm:text-xs font-black uppercase opacity-70 tracking-wider">Pending Approval</span>
+          <span className="text-2xl font-black text-orange-700">{allInvoices.filter(i => ['PENDING_APPROVAL', 'PENDING APPROVAL'].includes(i.status?.toUpperCase())).length}</span>
         </div>
-        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 flex flex-col">
-          <span className="text-xs font-bold uppercase opacity-70">Completed Today</span>
-          <span className="text-2xl font-bold text-green-700">{allInvoices.filter(i => ['PAID', 'APPROVED', 'VERIFIED'].includes(i.status?.toUpperCase())).length}</span>
+        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 flex flex-col shadow-sm">
+          <span className="text-[10px] sm:text-xs font-black uppercase opacity-70 tracking-wider">Completed Today</span>
+          <span className="text-2xl font-black text-green-700">{allInvoices.filter(i => ['PAID', 'APPROVED', 'VERIFIED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
       </div>
 
@@ -117,7 +147,7 @@ function DigitizationPageContent() {
             <p className="text-gray-500 animate-pulse">Loading invoices...</p>
           </div>
         ) : (
-          <InvoiceList invoices={invoices} />
+          <InvoiceList invoices={invoices} viewMode={viewMode} />
         )}
       </div>
     </div>
