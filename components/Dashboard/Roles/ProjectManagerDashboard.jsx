@@ -176,9 +176,9 @@ export default function ProjectManagerDashboard({ user }) {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-6 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl text-white shadow-xl flex items-center justify-between">
-                    <div>
+            <div className="grid grid-cols-1 gap-6">
+                <div className="p-6 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-center sm:text-left">
                         <h3 className="font-bold text-lg">Need to expedite processing?</h3>
                         <p className="text-indigo-100 text-sm mt-1">Delegate your approval authority temporarily.</p>
                     </div>
@@ -187,9 +187,9 @@ export default function ProjectManagerDashboard({ user }) {
                             const to = prompt("Delegate PM authority to (e.g. Finance User):");
                             if (to) alert(`Delegated to ${to}`);
                         }}
-                        className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-bold text-sm shadow hover:bg-indigo-50 transition-colors"
+                        className="px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow hover:bg-indigo-50 transition-colors whitespace-nowrap"
                     >
-                        Delegate
+                        Delegate Authority
                     </button>
                 </div>
             </div>

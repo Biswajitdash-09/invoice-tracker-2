@@ -56,10 +56,10 @@ export const AuthProvider = ({ children }) => {
         // Defer first version check so fetch has a valid origin (avoids "Failed to fetch" on fast load)
         const versionCheckTimer = setTimeout(() => {
             autoUpdateOnVersionChange();
-        }, 1500);
+        }, 500);
 
-        // Continue periodic checks
-        const cleanup = startVersionCheck(60000); // Check every 1 minute
+        // Continue periodic checks (uses default 30s interval from startVersionCheck)
+        const cleanup = startVersionCheck();
         return () => {
             clearTimeout(versionCheckTimer);
             cleanup?.();
@@ -119,13 +119,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        try {
-            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-            setUser(null);
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
+        // Clear local state immediately for instant UI response
+        setUser(null);
+        // Redirect immediately (no waiting)
+        router.push("/login");
+        // Fire logout API in background (don't await)
+        fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+            .catch(error => console.error("Logout API error:", error));
     };
 
     const switchRole = (newRole) => {

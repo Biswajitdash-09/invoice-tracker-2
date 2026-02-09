@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request, { params }) {
     try {
         const user = await getCurrentUser();
-        const { id } = params;
+        const { id } = await params;
 
         if (!user || user.role !== ROLES.VENDOR) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

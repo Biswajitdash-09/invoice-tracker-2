@@ -65,6 +65,24 @@ const users = [
         department: 'Operations'
     },
     {
+        id: 'u-pm-02',
+        name: 'Sarah Connor',
+        email: 'sarah.connor@invoiceflow.com',
+        role: ROLES.PROJECT_MANAGER,
+        assignedProjects: ['Cloud Migration'],
+        vendorId: null,
+        department: 'Operations'
+    },
+    {
+        id: 'u-pm-03',
+        name: 'John Smith',
+        email: 'john.smith@invoiceflow.com',
+        role: ROLES.PROJECT_MANAGER,
+        assignedProjects: ['Metropolis Redesign'],
+        vendorId: null,
+        department: 'Engineering'
+    },
+    {
         id: 'u-vendor-01',
         name: 'Acme Solutions',
         email: 'vendor@acme.com',
