@@ -94,19 +94,21 @@ export default function ApprovalsPage() {
                 className="group relative flex flex-col p-6 rounded-2xl bg-white/40 border border-white/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Header: title/ID left, status badge right - no overlap */}
-                <div className="flex justify-between items-start gap-3 mb-4 min-h-[3.5rem]">
+                <div className="flex justify-between items-start gap-3 mb-4 min-h-14">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-12 h-12 shrink-0 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
                       <Icon name="FileClock" size={24} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-gray-800 truncate text-sm" title={invoice.originalName || invoice.vendorName}>
+                      <h3 className="font-bold text-gray-800 text-sm leading-tight line-clamp-2" title={invoice.originalName || invoice.vendorName}>
                         {invoice.originalName || invoice.vendorName}
                       </h3>
-                      <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block mt-1 truncate max-w-full">
-                        {invoice.id}
-                      </span>
-                      <p className="text-xs text-gray-500 mt-1 truncate">{invoice.vendorName}</p>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 select-all">
+                          {invoice.id}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1 truncate font-medium">{invoice.vendorName}</p>
                     </div>
                   </div>
                   <div className="shrink-0 badge badge-warning bg-amber-500/10 text-amber-700 border-none font-semibold text-[10px] uppercase tracking-wide whitespace-nowrap">
@@ -145,7 +147,7 @@ export default function ApprovalsPage() {
                 </Link>
 
                 {/* Decorative corner - behind content so no overlap */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/20 to-transparent rounded-tr-2xl pointer-events-none -z-10" aria-hidden></div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-br from-white/20 to-transparent rounded-tr-2xl pointer-events-none -z-10" aria-hidden></div>
               </motion.div>
             ))}
           </div>

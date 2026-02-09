@@ -116,10 +116,16 @@ const AdminDashboard = ({ invoices = [], onRefresh }) => {
                     {typeof onRefresh === "function" && (
                         <button
                             type="button"
-                            onClick={(e) => { e.stopPropagation(); onRefresh(); }}
-                            className="text-sm text-primary font-medium hover:underline flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-primary/5 shrink-0"
+                            onClick={async (e) => {
+                                e.stopPropagation();
+                                setLoading(true);
+                                await onRefresh();
+                                setLoading(false);
+                            }}
+                            disabled={loading}
+                            className="text-sm text-primary font-medium hover:underline flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-primary/5 shrink-0 disabled:opacity-50"
                         >
-                            <Icon name="RefreshCw" size={14} /> Refresh
+                            <Icon name="RefreshCw" size={14} className={loading ? "animate-spin" : ""} /> Refresh
                         </button>
                     )}
                 </div>
@@ -139,7 +145,11 @@ const AdminDashboard = ({ invoices = [], onRefresh }) => {
                                     invoices.slice(0, 10).map((inv) => (
                                         <Link
                                             key={inv.id}
-                                            href="/approvals"
+                                            href={
+                                                inv.status === 'MATCH_DISCREPANCY' ? `/matching/${inv.id}` :
+                                                    inv.status === 'VALIDATION_REQUIRED' ? `/digitization/${inv.id}` :
+                                                        `/approvals/${inv.id}`
+                                            }
                                             className="block p-4 flex justify-between items-center hover:bg-slate-50/80 transition-colors gap-4"
                                         >
                                             <div className="flex items-center gap-4 min-w-0 flex-1">
