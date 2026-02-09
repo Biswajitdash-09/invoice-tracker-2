@@ -45,13 +45,6 @@ export default function ProjectManagerDashboard({ user, invoices = [] }) {
         }
     ];
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <span className="loading loading-spinner loading-md text-primary"></span>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-8">
