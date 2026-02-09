@@ -45,6 +45,7 @@ export async function PUT(request, { params }) {
             role: data.role || existingUser.role,
             assignedProjects: data.assignedProjects !== undefined ? data.assignedProjects : existingUser.assignedProjects,
             vendorId: data.vendorId !== undefined ? data.vendorId : existingUser.vendorId,
+            isActive: data.isActive !== undefined ? data.isActive : existingUser.isActive,
             passwordHash: fullUser.password_hash // Preserve hash
         };
 

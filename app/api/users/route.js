@@ -57,7 +57,9 @@ export async function POST(request) {
             role: data.role,
             passwordHash,
             assignedProjects: data.assignedProjects || [],
-            vendorId: data.vendorId || null
+            assignedProjects: data.assignedProjects || [],
+            vendorId: data.vendorId || null,
+            isActive: data.isActive !== undefined ? data.isActive : true
         };
 
         const created = await db.createUser(newUser);
