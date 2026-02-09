@@ -27,7 +27,7 @@ const ApprovalActions = ({ invoiceId, onActionComplete }) => {
       // Wait for toast animation before redirecting
       setTimeout(() => {
         if (onActionComplete) {
-          onActionComplete();
+          onActionComplete(decision === "Approved" ? "APPROVED" : "REJECTED");
         } else {
           router.push("/approvals");
         }
@@ -83,8 +83,8 @@ const ApprovalActions = ({ invoiceId, onActionComplete }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
             className={`absolute -top-20 left-0 right-0 z-50 p-4 rounded-xl shadow-2xl flex items-center justify-center gap-3 border ${showToast === "approved"
-                ? "bg-success text-white border-success-content/20"
-                : "bg-error text-white border-error-content/20"
+              ? "bg-success text-white border-success-content/20"
+              : "bg-error text-white border-error-content/20"
               }`}
           >
             <Icon

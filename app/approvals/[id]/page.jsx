@@ -189,7 +189,13 @@ export default function ApprovalDetailPage() {
         >
           {/* Approval Actions */}
           {!isProcessed ? (
-            <ApprovalActions invoiceId={invoice.id} />
+            <ApprovalActions
+              invoiceId={invoice.id}
+              onActionComplete={(newStatus) => {
+                // Optimistically update the UI to show success state immediately
+                setInvoice(prev => ({ ...prev, status: newStatus }));
+              }}
+            />
           ) : (
             <div
               className={`p-6 rounded-2xl border ${invoice.status === "APPROVED" || invoice.status === "PAID"
