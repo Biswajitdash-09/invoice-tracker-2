@@ -39,7 +39,7 @@ export async function POST(request) {
 
         // Additional document files
         const timesheetFile = formData.get('timesheet');
-        const annexFile = formData.get('annex');
+        const rfpFile = formData.get('rfpCommercial');
 
         if (!invoiceFile) {
             return NextResponse.json(
@@ -110,28 +110,28 @@ export async function POST(request) {
             documentIds.push({ documentId: tsId, type: 'TIMESHEET' });
         }
 
-        // Save annex if provided
-        if (annexFile) {
-            const axBytes = await annexFile.arrayBuffer();
-            const axBuffer = Buffer.from(axBytes);
-            const axId = uuidv4();
-            const axExt = path.extname(annexFile.name);
-            const axFileName = `${axId}${axExt}`;
-            await writeFile(path.join(docsDir, axFileName), axBuffer);
+        // Save RFP Commercial if provided
+        if (rfpFile) {
+            const rfpBytes = await rfpFile.arrayBuffer();
+            const rfpBuffer = Buffer.from(rfpBytes);
+            const rfpId = uuidv4();
+            const rfpExt = path.extname(rfpFile.name);
+            const rfpFileName = `${rfpId}${rfpExt}`;
+            await writeFile(path.join(docsDir, rfpFileName), rfpBuffer);
 
             await DocumentUpload.create({
-                id: axId,
+                id: rfpId,
                 invoiceId: invoiceId,
-                type: 'ANNEX',
-                fileName: annexFile.name,
-                fileUrl: `/uploads/documents/${axFileName}`,
-                mimeType: annexFile.type,
-                fileSize: axBuffer.length,
+                type: 'RFP_COMMERCIAL',
+                fileName: rfpFile.name,
+                fileUrl: `/uploads/documents/${rfpFileName}`,
+                mimeType: rfpFile.type,
+                fileSize: rfpBuffer.length,
                 uploadedBy: session.user.id,
                 metadata: { billingMonth },
                 status: 'PENDING'
             });
-            documentIds.push({ documentId: axId, type: 'ANNEX' });
+            documentIds.push({ documentId: rfpId, type: 'RFP_COMMERCIAL' });
         }
 
         // Update invoice with document references

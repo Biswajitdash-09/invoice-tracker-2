@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DOCUMENT_TYPES = [
-    { value: 'RINGI', label: 'Ringi', description: 'PDF format' },
-    { value: 'ANNEX', label: 'Annex', description: 'PDF, Word, or Excel format' },
-    { value: 'TIMESHEET', label: 'Timesheet', description: 'Excel or PDF format - validated at upload' }
+    { value: 'RINGI', label: 'Ringi', description: 'PDF format', color: 'purple' },
+    { value: 'RFP_COMMERCIAL', label: 'RFP Commercial', description: 'PDF, Word, or Excel', color: 'blue' },
+    { value: 'TIMESHEET', label: 'Timesheet', description: 'Excel/PDF - validated', color: 'green' },
+    { value: 'RATE_CARD', label: 'Rate Card', description: 'Excel/PDF - validated', color: 'amber' }
 ];
 
 export default function PMDocumentsPage() {
@@ -27,8 +28,10 @@ export default function PMDocumentsPage() {
         projectId: '',
         projectName: '',
         billingMonth: '',
-        ringiNumber: ''
+        ringiNumber: '',
+        description: ''
     });
+    const [validationResult, setValidationResult] = useState(null);
 
     useEffect(() => {
         fetchDocuments();
@@ -77,6 +80,7 @@ export default function PMDocumentsPage() {
         try {
             setUploading(true);
             setError(null);
+            setValidationResult(null);
 
             const formData = new FormData();
             formData.append('file', uploadData.file);
@@ -85,6 +89,7 @@ export default function PMDocumentsPage() {
             if (uploadData.projectName) formData.append('projectName', uploadData.projectName);
             if (uploadData.billingMonth) formData.append('billingMonth', uploadData.billingMonth);
             if (uploadData.ringiNumber) formData.append('ringiNumber', uploadData.ringiNumber);
+            if (uploadData.description) formData.append('description', uploadData.description);
 
             const res = await fetch('/api/pm/documents', {
                 method: 'POST',
@@ -93,7 +98,14 @@ export default function PMDocumentsPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
 
-            setSuccess('Document uploaded successfully!');
+            // Show validation result
+            if (data.validation) {
+                setValidationResult(data.validation);
+            }
+
+            setSuccess(data.validation?.isValid
+                ? 'Document uploaded and validated successfully!'
+                : 'Document uploaded - pending review');
             setShowUploadModal(false);
             setUploadData({
                 file: null,
@@ -101,7 +113,8 @@ export default function PMDocumentsPage() {
                 projectId: '',
                 projectName: '',
                 billingMonth: '',
-                ringiNumber: ''
+                ringiNumber: '',
+                description: ''
             });
             if (fileInputRef.current) fileInputRef.current.value = '';
             fetchDocuments();
@@ -115,8 +128,9 @@ export default function PMDocumentsPage() {
     const getTypeColor = (type) => {
         switch (type) {
             case 'RINGI': return 'bg-purple-500/20 text-purple-300';
-            case 'ANNEX': return 'bg-blue-500/20 text-blue-300';
+            case 'RFP_COMMERCIAL': return 'bg-blue-500/20 text-blue-300';
             case 'TIMESHEET': return 'bg-green-500/20 text-green-300';
+            case 'RATE_CARD': return 'bg-amber-500/20 text-amber-300';
             default: return 'bg-gray-500/20 text-gray-300';
         }
     };
@@ -310,8 +324,8 @@ export default function PMDocumentsPage() {
                                                     type="button"
                                                     onClick={() => setUploadData({ ...uploadData, type: t.value })}
                                                     className={`p-3 rounded-lg border text-center transition-all ${uploadData.type === t.value
-                                                            ? 'border-purple-500 bg-purple-500/20 text-white'
-                                                            : 'border-white/20 text-gray-400 hover:border-white/40'
+                                                        ? 'border-purple-500 bg-purple-500/20 text-white'
+                                                        : 'border-white/20 text-gray-400 hover:border-white/40'
                                                         }`}
                                                 >
                                                     <div className="font-medium">{t.label}</div>

@@ -179,15 +179,27 @@ export default function ProjectManagerDashboard({ user }) {
             <div className="grid grid-cols-1 gap-6">
                 <div className="p-6 bg-linear-to-r from-indigo-500 to-purple-600 rounded-2xl text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-center sm:text-left">
-                        <h3 className="font-bold text-lg">Need to expedite processing?</h3>
-                        <p className="text-indigo-100 text-sm mt-1">Delegate your approval authority temporarily.</p>
+                        <h3 className="font-bold text-lg">Manage Project Documents</h3>
+                        <p className="text-indigo-100 text-sm mt-1">Upload Ringi, Annex, Timesheets, and Rate Cards</p>
+                    </div>
+                    <Link
+                        href="/pm/documents"
+                        className="px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow hover:bg-indigo-50 transition-colors whitespace-nowrap"
+                    >
+                        Open Documents
+                    </Link>
+                </div>
+                <div className="p-6 bg-gray-50 border border-gray-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-center sm:text-left">
+                        <h3 className="font-bold text-lg text-gray-800">Need to expedite processing?</h3>
+                        <p className="text-gray-500 text-sm mt-1">Delegate your approval authority temporarily.</p>
                     </div>
                     <button
                         onClick={() => {
                             const to = prompt("Delegate PM authority to (e.g. Finance User):");
                             if (to) alert(`Delegated to ${to}`);
                         }}
-                        className="px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold text-sm shadow hover:bg-indigo-50 transition-colors whitespace-nowrap"
+                        className="px-6 py-3 bg-gray-800 text-white rounded-xl font-bold text-sm shadow hover:bg-gray-700 transition-colors whitespace-nowrap"
                     >
                         Delegate Authority
                     </button>

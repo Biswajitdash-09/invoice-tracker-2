@@ -35,15 +35,20 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        // Password validation for new users
+        if (!data.password || data.password.length < 8) {
+            return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 });
+        }
+
         // Check if user exists
         const existing = await db.getUserByEmail(data.email);
         if (existing) {
             return NextResponse.json({ error: 'User already exists' }, { status: 409 });
         }
 
-        // Default password for new users (In prod, send invitation email)
+        // Hash password from request
         const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash('Password123!', salt);
+        const passwordHash = await bcrypt.hash(data.password, salt);
 
         const newUser = {
             id: `u-${Date.now()}`,

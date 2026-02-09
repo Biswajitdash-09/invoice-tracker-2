@@ -6,8 +6,8 @@ import { requireRole, checkPermission } from '@/lib/rbac';
 import { ROLES } from '@/constants/roles';
 import { db } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { validateFileType } from '@/lib/services/ocr';
+import { validateTimesheet, validateRateCard } from '@/lib/services/validation';
 
 /**
  * GET /api/pm/documents - List PM's uploaded documents
@@ -19,7 +19,7 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        const roleCheck = requireRole([ROLES.ADMIN, ROLES.PROJECT_MANAGER])(session.user);
+        const roleCheck = requireRole([ROLES.ADMIN, ROLES.PROJECT_MANAGER, ROLES.FINANCE_USER])(session.user);
         if (!roleCheck.allowed) {
             return NextResponse.json({ error: roleCheck.reason }, { status: 403 });
         }
@@ -29,16 +29,18 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const projectId = searchParams.get('projectId');
         const type = searchParams.get('type');
+        const status = searchParams.get('status');
 
         let query = {};
 
-        // PMs only see their own uploads
+        // PMs only see their own uploads, admins and finance see all
         if (session.user.role === ROLES.PROJECT_MANAGER) {
             query.uploadedBy = session.user.id;
         }
 
         if (projectId) query.projectId = projectId;
         if (type) query.type = type;
+        if (status) query.status = status;
 
         const documents = await DocumentUpload.find(query).sort({ created_at: -1 });
 
@@ -50,7 +52,8 @@ export async function GET(request) {
 }
 
 /**
- * POST /api/pm/documents - Upload document (Ringi, Annex, Timesheet)
+ * POST /api/pm/documents - Upload document (Ringi, Annex, Timesheet, Rate Card)
+ * Enhanced with comprehensive validation for timesheets and rate cards
  */
 export async function POST(request) {
     try {
@@ -71,6 +74,8 @@ export async function POST(request) {
         const billingMonth = formData.get('billingMonth');
         const ringiNumber = formData.get('ringiNumber');
         const projectName = formData.get('projectName');
+        const vendorId = formData.get('vendorId');
+        const description = formData.get('description');
 
         if (!file || !type) {
             return NextResponse.json(
@@ -88,29 +93,71 @@ export async function POST(request) {
             );
         }
 
+        // Validate file type for document type
+        const fileTypeValidation = validateFileType(file.name, type);
+        if (!fileTypeValidation.valid) {
+            return NextResponse.json(
+                { error: fileTypeValidation.error },
+                { status: 400 }
+            );
+        }
+
         await connectToDatabase();
 
-        // Save file to uploads directory
+        // Read file buffer
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const uploadsDir = path.join(process.cwd(), 'uploads', 'documents');
-        await mkdir(uploadsDir, { recursive: true });
+        // Store as Base64 for Vercel compatibility
+        const base64String = buffer.toString('base64');
+        const mimeType = file.type || 'application/octet-stream';
+        const fileUrl = `data:${mimeType};base64,${base64String}`;
 
         const fileId = uuidv4();
-        const ext = path.extname(file.name);
-        const fileName = `${fileId}${ext}`;
-        const filePath = path.join(uploadsDir, fileName);
 
-        await writeFile(filePath, buffer);
-
-        // Timesheet validation
+        // Initialize validation results
         let validated = false;
         let validationNotes = '';
+        let validationData = null;
+        let validationErrors = [];
+        let validationWarnings = [];
+
+        // Perform type-specific validation
         if (type === 'TIMESHEET') {
-            // Basic validation - check file exists and has content
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            if (['xls', 'xlsx'].includes(ext)) {
+                const validation = await validateTimesheet(buffer, { vendorId, projectId });
+                validated = validation.isValid;
+                validationErrors = validation.errors || [];
+                validationWarnings = validation.warnings || [];
+                validationData = validation.data;
+                validationNotes = validated
+                    ? `Validated: ${validation.data?.summary?.totalHours || 0} hours across ${validation.data?.summary?.totalEntries || 0} entries`
+                    : `Validation failed: ${validationErrors.slice(0, 3).join('; ')}`;
+            } else {
+                // PDF timesheet - mark as pending manual review
+                validated = false;
+                validationNotes = 'PDF timesheet requires manual review';
+            }
+        } else if (type === 'RATE_CARD') {
+            const ext = file.name.split('.').pop()?.toLowerCase();
+            if (['xls', 'xlsx'].includes(ext)) {
+                const validation = await validateRateCard(buffer);
+                validated = validation.isValid;
+                validationErrors = validation.errors || [];
+                validationWarnings = validation.warnings || [];
+                validationData = validation.data;
+                validationNotes = validated
+                    ? `Validated: ${validation.data?.summary?.totalRates || 0} rate entries`
+                    : `Validation failed: ${validationErrors.slice(0, 3).join('; ')}`;
+            } else {
+                validated = false;
+                validationNotes = 'PDF rate card requires manual review';
+            }
+        } else if (type === 'RINGI' || type === 'ANNEX') {
+            // Basic validation - file exists and has content
             validated = buffer.length > 0;
-            validationNotes = validated ? 'File validated at upload' : 'Empty file detected';
+            validationNotes = validated ? 'Document received' : 'Empty file detected';
         }
 
         // Create document record
@@ -120,8 +167,8 @@ export async function POST(request) {
             invoiceId: invoiceId || null,
             type,
             fileName: file.name,
-            fileUrl: `/uploads/documents/${fileName}`,
-            mimeType: file.type,
+            fileUrl: fileUrl,
+            mimeType: mimeType,
             fileSize: buffer.length,
             uploadedBy: session.user.id,
             metadata: {
@@ -129,7 +176,9 @@ export async function POST(request) {
                 validated,
                 validationNotes,
                 ringiNumber: ringiNumber || null,
-                projectName: projectName || null
+                projectName: projectName || null,
+                description: description || null,
+                validationData: validationData ? JSON.stringify(validationData) : null
             },
             status: validated ? 'VALIDATED' : 'PENDING'
         });
@@ -139,15 +188,68 @@ export async function POST(request) {
             invoice_id: invoiceId || null,
             username: session.user.name || session.user.email,
             action: 'DOCUMENT_UPLOADED',
-            details: `Uploaded ${type}: ${file.name}`
+            details: `Uploaded ${type}: ${file.name}${validated ? ' (Validated)' : ' (Pending)'}`
         });
 
         return NextResponse.json({
             success: true,
-            document: document.toObject()
+            document: document.toObject(),
+            validation: {
+                isValid: validated,
+                errors: validationErrors,
+                warnings: validationWarnings,
+                notes: validationNotes
+            }
         }, { status: 201 });
     } catch (error) {
         console.error('Error uploading document:', error);
         return NextResponse.json({ error: 'Failed to upload document' }, { status: 500 });
     }
 }
+
+/**
+ * DELETE /api/pm/documents - Delete a document
+ */
+export async function DELETE(request) {
+    try {
+        const session = await getSession();
+        if (!session?.user) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const documentId = searchParams.get('id');
+
+        if (!documentId) {
+            return NextResponse.json({ error: 'Document ID required' }, { status: 400 });
+        }
+
+        await connectToDatabase();
+
+        const document = await DocumentUpload.findOne({ id: documentId });
+        if (!document) {
+            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+        }
+
+        // Only allow deletion of own documents (unless admin)
+        if (session.user.role !== ROLES.ADMIN && document.uploadedBy !== session.user.id) {
+            return NextResponse.json({ error: 'Not authorized to delete this document' }, { status: 403 });
+        }
+
+        await DocumentUpload.deleteOne({ id: documentId });
+
+        // Audit trail
+        await db.createAuditTrailEntry({
+            invoice_id: document.invoiceId || null,
+            username: session.user.name || session.user.email,
+            action: 'DOCUMENT_DELETED',
+            details: `Deleted ${document.type}: ${document.fileName}`
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
+    }
+}
+

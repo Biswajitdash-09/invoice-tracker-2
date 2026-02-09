@@ -12,12 +12,12 @@ export default function VendorSubmitPage() {
 
     const invoiceRef = useRef(null);
     const timesheetRef = useRef(null);
-    const annexRef = useRef(null);
+    const rfpRef = useRef(null);
 
     const [formData, setFormData] = useState({
         invoiceFile: null,
         timesheetFile: null,
-        annexFile: null,
+        rfpFile: null,
         invoiceNumber: '',
         invoiceDate: '',
         amount: '',
@@ -45,9 +45,9 @@ export default function VendorSubmitPage() {
 
     const fetchPMs = async () => {
         try {
-            const res = await fetch('/api/users?role=PM');
+            const res = await fetch('/api/pms');
             const data = await res.json();
-            if (res.ok) setPMs(data.users || []);
+            if (res.ok) setPMs(data.pms || []);
         } catch (err) {
             console.error('Error fetching PMs:', err);
         }
@@ -75,7 +75,7 @@ export default function VendorSubmitPage() {
             const submitData = new FormData();
             submitData.append('invoice', formData.invoiceFile);
             if (formData.timesheetFile) submitData.append('timesheet', formData.timesheetFile);
-            if (formData.annexFile) submitData.append('annex', formData.annexFile);
+            if (formData.rfpFile) submitData.append('rfpCommercial', formData.rfpFile);
             submitData.append('invoiceNumber', formData.invoiceNumber);
             submitData.append('invoiceDate', formData.invoiceDate);
             submitData.append('amount', formData.amount);
@@ -97,7 +97,7 @@ export default function VendorSubmitPage() {
             setFormData({
                 invoiceFile: null,
                 timesheetFile: null,
-                annexFile: null,
+                rfpFile: null,
                 invoiceNumber: '',
                 invoiceDate: '',
                 amount: '',
@@ -108,7 +108,7 @@ export default function VendorSubmitPage() {
             });
             if (invoiceRef.current) invoiceRef.current.value = '';
             if (timesheetRef.current) timesheetRef.current.value = '';
-            if (annexRef.current) annexRef.current.value = '';
+            if (rfpRef.current) rfpRef.current.value = '';
         } catch (err) {
             setError(err.message);
         } finally {
@@ -274,16 +274,16 @@ export default function VendorSubmitPage() {
                                     )}
                                 </div>
                                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Annex</label>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">RFP Commercial</label>
                                     <input
-                                        ref={annexRef}
+                                        ref={rfpRef}
                                         type="file"
-                                        onChange={(e) => handleFileChange('annexFile', e)}
+                                        onChange={(e) => handleFileChange('rfpFile', e)}
                                         accept=".pdf,.doc,.docx,.xlsx,.xls"
                                         className="w-full text-sm text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-600/50 file:text-blue-200 file:cursor-pointer"
                                     />
-                                    {formData.annexFile && (
-                                        <p className="mt-1 text-xs text-blue-400">✓ {formData.annexFile.name}</p>
+                                    {formData.rfpFile && (
+                                        <p className="mt-1 text-xs text-blue-400">✓ {formData.rfpFile.name}</p>
                                     )}
                                 </div>
                             </div>

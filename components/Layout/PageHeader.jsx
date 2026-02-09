@@ -40,25 +40,25 @@ export default function PageHeader({ title, subtitle, icon = "LayoutDashboard", 
   const displayRole = roleLabel ?? (user?.role ? user.role.toLowerCase().replace(/\s+/g, " ") : "User");
 
   return (
-    <header className="bg-white border-b border-slate-200/80 shadow-sm py-4 mb-6 px-6 rounded-t-3xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`p-2.5 bg-gradient-to-br ${gradientClass} rounded-xl shadow-lg`}>
+    <header className="bg-white border-b border-slate-200/80 shadow-sm py-4 mb-6 px-4 md:px-6 rounded-t-3xl">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0">
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className={`p-2.5 bg-gradient-to-br ${gradientClass} rounded-xl shadow-lg shrink-0`}>
             <Icon name={icon} className="text-white w-6 h-6" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight truncate">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-xs font-medium text-slate-500 mt-0.5">
+              <p className="text-xs font-medium text-slate-500 mt-0.5 truncate">
                 {subtitle}
               </p>
             )}
           </div>
         </div>
 
-        {actions && <div className="flex items-center gap-2 lg:gap-3">{actions}</div>}
+        {actions && <div className="flex items-center gap-2 lg:gap-3 w-full md:w-auto justify-end">{actions}</div>}
 
         {user && (
           <div className="flex items-center gap-3">
