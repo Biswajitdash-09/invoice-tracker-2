@@ -78,7 +78,6 @@ export default function PageHeader({ title, subtitle, icon = "LayoutDashboard", 
                 <button
                   onClick={() => {
                     logout();
-                    router.push("/login");
                   }}
                   className="text-sm font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
                 >
