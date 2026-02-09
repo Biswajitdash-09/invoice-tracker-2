@@ -348,7 +348,12 @@ export default function DashboardPage() {
               onClick={() => setIsUploadModalOpen(false)}
               className="btn btn-ghost rounded-full px-8 text-xs font-bold uppercase"
             >Cancel Submission</button>
-            <button className="btn btn-primary rounded-full px-10 shadow-lg shadow-primary/20 text-xs font-bold uppercase">View Guidelines</button>
+            <button
+              onClick={() => setIsUploadModalOpen(false)}
+              className="btn btn-primary rounded-full px-10 shadow-lg shadow-primary/20 text-xs font-bold uppercase"
+            >
+              Done
+            </button>
           </div>
         </div>
         <div className="modal-backdrop backdrop-blur-sm bg-black/40" onClick={() => setIsUploadModalOpen(false)}>

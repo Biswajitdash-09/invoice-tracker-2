@@ -43,12 +43,21 @@ const Navbar = () => {
             <Icon name={isMobileMenuOpen ? "X" : "Menu"} size={24} />
           </div>
           {isMobileMenuOpen && (
-            <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 absolute left-0 top-full">
-              {canSeeMenuItem(user, "Dashboard") && <li><Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link></li>}
-              {canSeeMenuItem(user, "Vendors") && <li><Link href="/vendors" onClick={() => setIsMobileMenuOpen(false)}>Vendors</Link></li>}
-              {canSeeMenuItem(user, "Digitization") && <li><Link href="/digitization" onClick={() => setIsMobileMenuOpen(false)}>Digitization</Link></li>}
-              {canSeeMenuItem(user, "Approvals") && <li><Link href="/approvals" onClick={() => setIsMobileMenuOpen(false)}>Approvals</Link></li>}
-              {canSeeMenuItem(user, "Analytics") && <li><Link href="/analytics" onClick={() => setIsMobileMenuOpen(false)}>Analytics</Link></li>}
+            <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[100] p-2 shadow-xl bg-base-100 rounded-box w-64 border border-base-200 absolute left-0 top-full max-h-[80vh] overflow-y-auto">
+              <li className="menu-title px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Menu</li>
+              {/* Menu items consistent with Sidebar */}
+              {canSeeMenuItem(user, "Dashboard") && <li><Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}><Icon name="LayoutDashboard" size={16} /> Dashboard</Link></li>}
+              {canSeeMenuItem(user, "Digitization") && <li><Link href="/digitization" onClick={() => setIsMobileMenuOpen(false)}><Icon name="ScanLine" size={16} /> Digitization</Link></li>}
+              {canSeeMenuItem(user, "Matching") && <li><Link href="/matching" onClick={() => setIsMobileMenuOpen(false)}><Icon name="GitMerge" size={16} /> Matching</Link></li>}
+              {canSeeMenuItem(user, "Approvals") && <li><Link href="/approvals" onClick={() => setIsMobileMenuOpen(false)}><Icon name="CheckCircle" size={16} /> Approvals</Link></li>}
+              {canSeeMenuItem(user, "Vendors") && <li><Link href="/vendors" onClick={() => setIsMobileMenuOpen(false)}><Icon name="Users" size={16} /> Vendors</Link></li>}
+              {canSeeMenuItem(user, "Analytics") && <li><Link href="/analytics" onClick={() => setIsMobileMenuOpen(false)}><Icon name="BarChart3" size={16} /> Analytics</Link></li>}
+
+              <div className="divider my-1"></div>
+
+              {canSeeMenuItem(user, "Configuration") && <li><Link href="/config" onClick={() => setIsMobileMenuOpen(false)}><Icon name="Settings" size={16} /> Configuration</Link></li>}
+              {canSeeMenuItem(user, "User Management") && <li><Link href="/users" onClick={() => setIsMobileMenuOpen(false)}><Icon name="Shield" size={16} /> User Management</Link></li>}
+              {canSeeMenuItem(user, "Audit Logs") && <li><Link href="/audit" onClick={() => setIsMobileMenuOpen(false)}><Icon name="FileText" size={16} /> Audit Logs</Link></li>}
             </ul>
           )}
         </div>
