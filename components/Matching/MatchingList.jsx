@@ -43,24 +43,24 @@ const MatchingList = ({ invoices }) => {
           className="group relative flex flex-col p-6 rounded-2xl bg-white/40 border border-white/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
         >
           {/* Header */}
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20">
+          <div className="flex justify-between items-start mb-4 gap-2">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-12 h-12 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20 shrink-0">
                 <Icon name="FileText" size={24} />
               </div>
-              <div>
-                <h3 className="font-bold text-gray-800 line-clamp-1">{invoice.vendorName}</h3>
-                <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                  {invoice.id}
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-gray-800 truncate">{invoice.vendorName}</h3>
+                <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200 inline-block max-w-full truncate">
+                  {invoice.invoiceNumber || invoice.id}
                 </span>
               </div>
             </div>
             <div className={clsx(
-              "badge border-none font-semibold",
+              "badge border-none font-semibold text-[10px] shrink-0 max-w-[100px] truncate",
               invoice.status === 'VERIFIED' ? "badge-success text-white" :
                 invoice.status === 'MATCH_DISCREPANCY' ? "badge-error text-white" : "badge-info bg-blue-500/10 text-blue-700"
-            )}>
-              {invoice.status}
+            )} title={invoice.status}>
+              {invoice.status === 'MATCH_DISCREPANCY' ? 'DISCREPANCY' : invoice.status}
             </div>
           </div>
 

@@ -4,13 +4,73 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@/constants/roles";
-import { getInvoiceStatus } from "@/lib/api";
+import { getInvoiceStatus, transitionWorkflow } from "@/lib/api";
 import ThreeWayMatch from "@/components/Matching/ThreeWayMatch";
 import AuditTrail from "@/components/Workflow/AuditTrail";
 import ApprovalActions from "@/components/Workflow/ApprovalActions";
 import Icon from "@/components/Icon";
 import Link from "next/link";
 import { motion } from "framer-motion";
+
+// Inline component for restoring rejected/approved invoices
+function RestoreToReviewButton({ invoiceId }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleRestore = async () => {
+    setLoading(true);
+    try {
+      await transitionWorkflow(invoiceId, "RESTORE", "Restored to review by admin");
+      router.refresh();
+      setTimeout(() => router.push("/approvals"), 500);
+    } catch (error) {
+      console.error("Failed to restore invoice:", error);
+      alert("Failed to restore invoice. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!showConfirm) {
+    return (
+      <button
+        onClick={() => setShowConfirm(true)}
+        className="mt-4 btn btn-sm btn-ghost bg-white/60 border border-slate-200 text-slate-700 hover:bg-white hover:border-slate-300 gap-2"
+      >
+        <Icon name="RotateCcw" size={16} /> Restore to Review
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-4 p-4 bg-white/80 rounded-xl border border-slate-200 space-y-3">
+      <p className="text-sm font-medium text-slate-700">Restore this invoice to review status?</p>
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowConfirm(false)}
+          disabled={loading}
+          className="btn btn-sm btn-ghost flex-1"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleRestore}
+          disabled={loading}
+          className="btn btn-sm btn-primary flex-1 gap-2"
+        >
+          {loading ? (
+            <span className="loading loading-spinner loading-xs"></span>
+          ) : (
+            <Icon name="RotateCcw" size={14} />
+          )}
+          Confirm Restore
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 export default function ApprovalDetailPage() {
   const params = useParams();
@@ -150,8 +210,13 @@ export default function ApprovalDetailPage() {
                 Invoice {invoice.status === "PAID" ? "Paid" : invoice.status}
               </h3>
               <p className="text-sm opacity-80">
-                This workflow has been finalized. No further actions can be taken.
+                {invoice.status === "PAID"
+                  ? "This invoice has been paid. No further actions can be taken."
+                  : "This workflow has been finalized. You can restore it for re-review if needed."}
               </p>
+              {invoice.status !== "PAID" && (
+                <RestoreToReviewButton invoiceId={invoice.id} />
+              )}
             </div>
           )}
 

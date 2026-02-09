@@ -111,6 +111,16 @@ export async function POST(request, { params }) {
             }
             nextStatus = 'AWAITING_INFO';
             auditLog.details = `More Info Requested: ${comments || 'No specific requests'}`;
+        } else if (action === 'RESTORE') {
+            // Restore rejected/approved invoices back to review
+            if (userRole !== ROLES.ADMIN) {
+                return NextResponse.json({ error: 'Only Admin can restore invoices.' }, { status: 403 });
+            }
+            if (!['REJECTED', 'APPROVED'].includes(invoice.status)) {
+                return NextResponse.json({ error: 'Can only restore REJECTED or APPROVED invoices.' }, { status: 400 });
+            }
+            nextStatus = 'PENDING_APPROVAL';
+            auditLog.details = `Invoice restored to review: ${comments || 'No comments'}`;
         }
 
         const updatedInvoice = await db.saveInvoice(id, {

@@ -63,6 +63,19 @@ function MatchingPageContent() {
     loadData();
   }, []);
 
+  // Local filter and sort state
+  const [localStatusFilter, setLocalStatusFilter] = useState(statusFilter || 'ALL');
+  const [sortOrder, setSortOrder] = useState('desc'); // desc = newest first
+
+  // Apply local filters
+  const displayedInvoices = invoices
+    .filter(inv => localStatusFilter === 'ALL' || inv.status === localStatusFilter)
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at || a.date || 0);
+      const dateB = new Date(b.created_at || b.date || 0);
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto h-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -78,11 +91,25 @@ function MatchingPageContent() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2">
-            <Icon name="Filter" size={16} /> Filter
-          </button>
-          <button className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2">
-            <Icon name="SortDesc" size={16} /> Sort
+          {/* Filter Dropdown */}
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2">
+              <Icon name="Filter" size={16} /> Filter
+            </label>
+            <ul tabIndex={0} className="dropdown-content z-50 menu p-2 shadow-xl bg-white rounded-2xl w-52 border border-slate-100 mt-2">
+              <li><a onClick={() => setLocalStatusFilter('ALL')} className={`text-xs font-bold ${localStatusFilter === 'ALL' ? 'text-primary bg-primary/10' : 'text-slate-600'}`}>All Statuses</a></li>
+              <li><a onClick={() => setLocalStatusFilter('VERIFIED')} className={`text-xs font-bold ${localStatusFilter === 'VERIFIED' ? 'text-primary bg-primary/10' : 'text-emerald-600'}`}>Verified</a></li>
+              <li><a onClick={() => setLocalStatusFilter('MATCH_DISCREPANCY')} className={`text-xs font-bold ${localStatusFilter === 'MATCH_DISCREPANCY' ? 'text-primary bg-primary/10' : 'text-rose-600'}`}>Discrepancy</a></li>
+              <li><a onClick={() => setLocalStatusFilter('DIGITIZED')} className={`text-xs font-bold ${localStatusFilter === 'DIGITIZED' ? 'text-primary bg-primary/10' : 'text-blue-600'}`}>Digitized</a></li>
+            </ul>
+          </div>
+          {/* Sort Toggle */}
+          <button
+            onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+            className="btn btn-sm btn-ghost bg-white/40 border border-white/60 shadow-sm gap-2"
+          >
+            <Icon name={sortOrder === 'desc' ? 'SortDesc' : 'SortAsc'} size={16} />
+            {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
           </button>
         </div>
       </div>
@@ -95,7 +122,7 @@ function MatchingPageContent() {
             <p className="text-gray-500 animate-pulse">Syncing matching data...</p>
           </div>
         ) : (
-          <MatchingList invoices={invoices} />
+          <MatchingList invoices={displayedInvoices} />
         )}
       </div>
     </div>
