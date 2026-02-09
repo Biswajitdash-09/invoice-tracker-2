@@ -145,6 +145,37 @@ export default function UserManagementPage() {
                 }
             />
 
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm text-gray-500 font-medium">Total Users</p>
+                        <h3 className="text-2xl font-bold text-gray-800">{users.length}</h3>
+                    </div>
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <Icon name="Users" size={24} />
+                    </div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm text-gray-500 font-medium">Active Users</p>
+                        <h3 className="text-2xl font-bold text-green-600">{users.filter(u => u.isActive !== false).length}</h3>
+                    </div>
+                    <div className="p-3 bg-green-50 text-green-600 rounded-xl">
+                        <Icon name="CheckCircle" size={24} />
+                    </div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p className="text-sm text-gray-500 font-medium">Inactive Users</p>
+                        <h3 className="text-2xl font-bold text-red-500">{users.filter(u => u.isActive === false).length}</h3>
+                    </div>
+                    <div className="p-3 bg-red-50 text-red-500 rounded-xl">
+                        <Icon name="XCircle" size={24} />
+                    </div>
+                </div>
+            </div>
+
             {/* Filters */}
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-4 mb-6">
                 <div className="flex flex-col md:flex-row gap-4">
@@ -267,19 +298,8 @@ export default function UserManagementPage() {
                 )}
             </div>
 
-            {/* Stats Footer */}
             <div className="mt-6 flex items-center justify-between text-sm text-gray-500">
                 <span>Showing {filteredUsers.length} of {users.length} users</span>
-                <span>
-                    <span className="inline-flex items-center gap-1.5 mr-4">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        Active: {users.filter(u => u.isActive !== false).length}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                        Inactive: {users.filter(u => u.isActive === false).length}
-                    </span>
-                </span>
             </div>
 
             {/* Modal */}

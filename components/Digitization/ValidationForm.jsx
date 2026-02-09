@@ -32,7 +32,7 @@ const ValidationForm = ({ invoice: initialInvoice }) => {
     if (invoice) {
       setFormData({
         vendorName: invoice.vendorName || "",
-        invoiceNumber: invoice.invoiceNumber || "",
+        invoiceNumber: invoice.invoiceNumber || invoice.id || "", // Fallback to ID if number is missing
         date: invoice.invoiceDate || invoice.date || "",
         dueDate: invoice.dueDate || "",
         amount: invoice.totalAmount || invoice.amount || "",
@@ -97,7 +97,10 @@ const ValidationForm = ({ invoice: initialInvoice }) => {
   };
 
   const { user } = useAuth();
-  const isAuditor = false;
+
+  // Determine if the view should be read-only (Auditor mode)
+  // detailed view from audit log or if status is finalized
+  const isAuditor = ["APPROVED", "REJECTED", "PAID", "VERIFIED"].includes(invoice?.status);
 
   return (
     <Card className="h-full flex flex-col bg-white/40 border-white/60 backdrop-blur-xl overflow-hidden rounded-[2rem] shadow-2xl">
