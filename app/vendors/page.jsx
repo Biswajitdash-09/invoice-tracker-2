@@ -192,302 +192,248 @@ export default function VendorPortal() {
                 }
             />
 
-            {/* Stats cards - previous teal/emerald/amber/blue theme */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Submissions", value: stats.total, icon: "FileText", color: "teal" },
-                    { label: "Paid Invoices", value: stats.paid, icon: "CheckCircle", color: "emerald" },
-                    { label: "Pending Approval", value: stats.pending, icon: "Clock", color: "amber" },
-                    { label: "Total Volume", value: `₹${stats.amount.toLocaleString()}`, icon: "BarChart3", color: "blue" },
-                ].map((stat, i) => (
-                    <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-xl shadow-slate-200/40 relative overflow-hidden group"
-                    >
-                        <div className={clsx(
-                            "absolute top-0 right-0 w-24 h-24 blur-[40px] rounded-full -mr-12 -mt-12 transition-colors",
-                            stat.color === "teal" && "bg-teal-500/10 group-hover:bg-teal-500/20",
-                            stat.color === "emerald" && "bg-emerald-500/10 group-hover:bg-emerald-500/20",
-                            stat.color === "amber" && "bg-amber-500/10 group-hover:bg-amber-500/20",
-                            stat.color === "blue" && "bg-blue-500/10 group-hover:bg-blue-500/20"
-                        )} />
-                        <div className="flex items-center gap-4 mb-3">
-                            <div className={clsx(
-                                "p-2.5 rounded-xl",
-                                stat.color === "teal" && "bg-teal-50 text-teal-600",
-                                stat.color === "emerald" && "bg-emerald-50 text-emerald-600",
-                                stat.color === "amber" && "bg-amber-50 text-amber-600",
-                                stat.color === "blue" && "bg-blue-50 text-blue-600"
-                            )}>
-                                <Icon name={stat.icon} size={20} />
-                            </div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</p>
-                        </div>
-                        <p className="text-3xl font-black text-slate-800 tracking-tight">{stat.value}</p>
-                    </motion.div>
-                ))}
-            </div>
+            {/* Main Content Grid - Single Screen Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)] min-h-[600px]">
 
-            {/* Manual Submission Portal */}
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden flex flex-col lg:flex-row">
-                <div className="lg:w-1/3 p-8 md:p-12 space-y-8 bg-slate-50/50 border-r border-slate-100">
-                    <div>
-                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">Invoice <span className="text-teal-600">Submission</span></h2>
-                        <p className="text-slate-500 mt-2 font-medium">Please fill in the details below to submit your invoice.</p>
+                {/* Left Column: Stats & Submission Form */}
+                <div className="lg:col-span-1 flex flex-col gap-6 h-full overflow-hidden">
+                    {/* Compact Stats */}
+                    <div className="grid grid-cols-2 gap-3 shrink-0">
+                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-1.5 rounded-lg bg-teal-50 text-teal-600"><Icon name="FileText" size={14} /></div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</span>
+                            </div>
+                            <p className="text-xl font-black text-slate-800">{stats.total}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600"><Icon name="CheckCircle" size={14} /></div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paid</span>
+                            </div>
+                            <p className="text-xl font-black text-slate-800">{stats.paid}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600"><Icon name="Clock" size={14} /></div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending</span>
+                            </div>
+                            <p className="text-xl font-black text-slate-800">{stats.pending}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-2 mb-1">
+                                <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600"><Icon name="BarChart3" size={14} /></div>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Volume</span>
+                            </div>
+                            <p className="text-lg font-black text-slate-800 truncate" title={`₹${stats.amount.toLocaleString()}`}>
+                                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', notation: 'compact' }).format(stats.amount)}
+                            </p>
+                        </div>
                     </div>
-                    <div className="space-y-4">
-                        {[
-                            { icon: "CheckCircle", title: "Accuracy First", text: "Ensure all details match your uploaded invoice." },
-                            { icon: "Shield", title: "Secure Upload", text: "Your data is encrypted and secure." },
-                            { icon: "Clock", title: "Fast Processing", text: "Manual entry speeds up approvals." },
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex gap-4 p-4 hover:bg-white rounded-2xl transition-colors">
-                                <div className="p-2 bg-teal-100 text-teal-700 rounded-lg h-fit">
-                                    <Icon name={item.icon} size={18} />
-                                </div>
+
+                    {/* Submission Form - Scrollable if needed */}
+                    <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 flex-1 overflow-y-auto custom-scrollbar p-6">
+                        <div className="mb-6">
+                            <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                <Icon name="UploadCloud" size={20} className="text-teal-600" />
+                                New Submission
+                            </h2>
+                            <p className="text-xs text-slate-500 mt-1">Upload your invoice details below.</p>
+                        </div>
+
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            if (!selectedProject || !selectedPM) {
+                                alert("Please select a Project and PM.");
+                                return;
+                            }
+                            const form = e.target;
+                            const formData = new FormData(form);
+                            const file = formData.get('file');
+                            if (!file || file.size === 0) {
+                                alert("Please upload an invoice file.");
+                                return;
+                            }
+
+                            setLoading(true);
+                            try {
+                                const metadata = {
+                                    projectId: selectedProject,
+                                    assignedPM: selectedPM,
+                                    invoiceNumber: formData.get('invoiceNumber'),
+                                    date: formData.get('date'),
+                                    amount: formData.get('amount'),
+                                    dueDate: formData.get('dueDate')
+                                };
+
+                                await import("@/lib/api").then(mod => mod.ingestInvoice(file, metadata));
+                                alert("Invoice submitted successfully!");
+                                form.reset();
+                                setSelectedProject("");
+                                setSelectedPM("");
+                                handleUploadComplete();
+                            } catch (error) {
+                                console.error("Submission failed", error);
+                                alert("Failed to submit invoice. Please try again.");
+                            } finally {
+                                setLoading(false);
+                            }
+                        }} className="space-y-4">
+                            <div className="space-y-4">
                                 <div>
-                                    <p className="font-bold text-slate-800 text-sm">{item.title}</p>
-                                    <p className="text-[11px] text-slate-500 font-medium">{item.text}</p>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Project & PM</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <select
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none"
+                                            value={selectedProject}
+                                            onChange={(e) => handleProjectChange(e.target.value)}
+                                            required
+                                        >
+                                            <option value="">Select Project</option>
+                                            {projects.map(p => (
+                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                        <select
+                                            className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none disabled:opacity-50"
+                                            value={selectedPM}
+                                            onChange={(e) => setSelectedPM(e.target.value)}
+                                            disabled={!selectedProject || metadataLoading}
+                                            required
+                                        >
+                                            <option value="">Select PM</option>
+                                            {pms.map(pm => (
+                                                <option key={pm.id} value={pm.id}>{pm.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Invoice No</label>
+                                        <input type="text" name="invoiceNumber" className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" placeholder="INV-001" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Amount (₹)</label>
+                                        <input type="number" name="amount" step="0.01" className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" placeholder="0.00" required />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Date</label>
+                                        <input type="date" name="date" className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Due Date</label>
+                                        <input type="date" name="dueDate" className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50/50 text-xs font-medium focus:ring-2 focus:ring-teal-500 outline-none" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Document</label>
+                                    <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png" className="file-input file-input-bordered file-input-ghost file-input-sm w-full rounded-xl bg-slate-50/50" required />
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="lg:w-2/3 p-8 md:p-12">
-                    <form onSubmit={async (e) => {
-                        e.preventDefault();
-                        if (!selectedProject || !selectedPM) {
-                            alert("Please select a Project and PM.");
-                            return;
-                        }
-                        const form = e.target;
-                        const formData = new FormData(form);
-                        const file = formData.get('file');
-                        if (!file || file.size === 0) {
-                            alert("Please upload an invoice file.");
-                            return;
-                        }
 
-                        setLoading(true);
-                        try {
-                            // Construct metadata object
-                            const metadata = {
-                                projectId: selectedProject,
-                                assignedPM: selectedPM,
-                                invoiceNumber: formData.get('invoiceNumber'),
-                                date: formData.get('date'),
-                                amount: formData.get('amount'),
-                                dueDate: formData.get('dueDate')
-                            };
-
-                            // Call ingestInvoice with file and metadata
-                            await import("@/lib/api").then(mod => mod.ingestInvoice(file, metadata));
-
-                            alert("Invoice submitted successfully!");
-                            form.reset();
-                            setSelectedProject("");
-                            setSelectedPM("");
-                            handleUploadComplete(); // Refresh list
-                        } catch (error) {
-                            console.error("Submission failed", error);
-                            alert("Failed to submit invoice. Please try again.");
-                        } finally {
-                            setLoading(false);
-                        }
-                    }} className="space-y-6">
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Project</label>
-                                <select
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                                    value={selectedProject}
-                                    onChange={(e) => handleProjectChange(e.target.value)}
-                                    required
-                                >
-                                    <option value="">-- Select Project --</option>
-                                    {projects.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name} ({p.ringiNumber})</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Project Manager</label>
-                                <select
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all disabled:opacity-50"
-                                    value={selectedPM}
-                                    onChange={(e) => setSelectedPM(e.target.value)}
-                                    disabled={!selectedProject || metadataLoading}
-                                    required
-                                >
-                                    <option value="">-- Select PM --</option>
-                                    {pms.map(pm => (
-                                        <option key={pm.id} value={pm.id}>{pm.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Invoice Number</label>
-                                <input
-                                    type="text"
-                                    name="invoiceNumber"
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                                    placeholder="e.g. INV-2024-001"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Invoice Date</label>
-                                <input
-                                    type="date"
-                                    name="date"
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Amount (INR)</label>
-                                <input
-                                    type="number"
-                                    name="amount"
-                                    step="0.01"
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                                    placeholder="0.00"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Due Date</label>
-                                <input
-                                    type="date"
-                                    name="dueDate"
-                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Upload Invoice (PDF/Image)</label>
-                            <div className="relative">
-                                <input
-                                    type="file"
-                                    name="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    className="file-input file-input-bordered file-input-primary w-full h-12 rounded-xl bg-white"
-                                    required
-                                />
-                            </div>
-                            <p className="text-[10px] text-slate-400 mt-1">Max 15MB. PDF, JPG, PNG supported.</p>
-                        </div>
-
-                        <div className="flex justify-end">
                             <button
                                 type="submit"
-                                className="h-12 px-8 bg-teal-600 text-white rounded-xl font-bold shadow-lg shadow-teal-200 hover:bg-teal-700 hover:shadow-xl transition-all flex items-center gap-2"
+                                className="w-full h-11 bg-teal-600 text-white rounded-xl font-bold shadow-lg shadow-teal-200 hover:bg-teal-700 hover:shadow-xl transition-all flex items-center justify-center gap-2 mt-2"
                                 disabled={loading}
                             >
-                                {loading ? <span className="loading loading-spinner"></span> : <Icon name="Send" size={18} />}
+                                {loading ? <span className="loading loading-spinner loading-sm"></span> : <Icon name="Send" size={16} />}
                                 Submit Invoice
                             </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            {/* Submissions Intelligence - previous dark header table */}
-            <div className="space-y-6">
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
-                        <Icon name="Activity" size={18} />
+                        </form>
                     </div>
-                    Submissions Intelligence
-                </h2>
-                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-                    <div className="overflow-x-auto">
+                </div>
+
+                {/* Right Column: Submission History Table */}
+                <div className="lg:col-span-2 bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 flex flex-col overflow-hidden h-full">
+                    <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white z-10">
+                        <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <Icon name="History" size={20} className="text-teal-600" />
+                            Recent Submissions
+                        </h2>
+                        <span className="text-xs font-medium text-slate-400">
+                            Showing {Math.min(allSubmissions.length, 10)} of {allSubmissions.length}
+                        </span>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-900 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-800">
-                                    <th className="px-10 py-6">Document Identity</th>
-                                    <th className="px-6 py-6 border-l border-white/5">Submitted On</th>
-                                    <th className="px-6 py-6 border-l border-white/5">Gross Amount</th>
-                                    <th className="px-6 py-6 border-l border-white/5">Workflow Status</th>
-                                    <th className="px-10 py-6 text-right">Verification</th>
+                            <thead className="sticky top-0 bg-slate-50 z-10 shadow-sm">
+                                <tr className="text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                                    <th className="px-6 py-4">Invoice</th>
+                                    <th className="px-4 py-4">Date</th>
+                                    <th className="px-4 py-4">Amount</th>
+                                    <th className="px-4 py-4">Status</th>
+                                    <th className="px-6 py-4 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {loading ? (
-                                    [1, 2, 3].map((i) => (
+                                {loading && allSubmissions.length === 0 ? (
+                                    [1, 2, 3, 4, 5].map((i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td colSpan={5} className="px-10 py-6 bg-slate-50/50">
-                                                <div className="h-10 bg-slate-200 rounded-2xl w-full" />
+                                            <td colSpan={5} className="px-6 py-4">
+                                                <div className="h-8 bg-slate-100 rounded-lg w-full" />
                                             </td>
                                         </tr>
                                     ))
                                 ) : allSubmissions.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="px-10 py-20 text-center">
-                                            <div className="max-w-xs mx-auto space-y-3">
-                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
-                                                    <Icon name="Inbox" size={32} />
-                                                </div>
-                                                <p className="text-lg font-black text-slate-400">No Submissions Found</p>
-                                                <p className="text-xs text-slate-400 font-medium">Your uploaded documents will appear here in real-time as they are processed.</p>
+                                        <td colSpan={5} className="px-6 py-20 text-center text-slate-400">
+                                            <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <Icon name="Inbox" size={24} className="opacity-50" />
                                             </div>
+                                            <p className="text-sm font-medium">No submissions yet</p>
                                         </td>
                                     </tr>
                                 ) : (
-                                    allSubmissions.slice(0, 10).map((inv, idx) => (
+                                    allSubmissions.slice(0, 20).map((inv, idx) => (
                                         <motion.tr
                                             key={inv.id}
-                                            initial={{ opacity: 0, y: 6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.2, delay: idx * 0.02 }}
-                                            className="group hover:bg-slate-50/80 transition-colors cursor-default"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            className="group hover:bg-slate-50/50 transition-colors"
                                         >
-                                            <td className="px-10 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-11 h-11 rounded-xl bg-slate-100 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors flex items-center justify-center">
-                                                        <Icon name="FileText" size={20} />
+                                            <td className="px-6 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                                                        <Icon name="FileText" size={14} />
                                                     </div>
-                                                    <div>
-                                                        <p className="font-bold text-slate-800 text-sm truncate max-w-[200px]">{inv.originalName || "Corporate Invoice"}</p>
-                                                        <p className="text-[10px] text-slate-400 font-mono mt-0.5 tracking-tighter">REF: {inv.id.slice(0, 12)}…</p>
+                                                    <div className="min-w-0">
+                                                        <p className="font-bold text-slate-700 text-xs truncate max-w-[150px]" title={inv.originalName}>
+                                                            {inv.originalName || "Invoice"}
+                                                        </p>
+                                                        <p className="text-[9px] text-slate-400 font-mono mt-0.5">{inv.invoiceNumber || inv.id.slice(0, 8)}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-6 border-l border-slate-50 font-bold text-slate-500 text-sm italic tracking-tight">
-                                                {new Date(inv.receivedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                                            <td className="px-4 py-3 text-xs text-slate-500 font-medium">
+                                                {inv.date || new Date(inv.receivedAt).toLocaleDateString()}
                                             </td>
-                                            <td className="px-6 py-6 border-l border-slate-50">
-                                                <p className="font-black text-slate-900 text-sm">
-                                                    {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(inv.amount || 0)}
-                                                </p>
+                                            <td className="px-4 py-3 text-xs font-bold text-slate-700">
+                                                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(inv.amount || 0)}
                                             </td>
-                                            <td className="px-6 py-6 border-l border-slate-50">
+                                            <td className="px-4 py-3">
                                                 <span className={clsx(
-                                                    "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm inline-flex items-center gap-2",
+                                                    "px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide border inline-flex items-center gap-1.5",
                                                     getStatusStyle(inv.status)
                                                 )}>
-                                                    <span className={clsx("w-1.5 h-1.5 rounded-full", inv.status === "DIGITIZING" ? "bg-amber-500 animate-pulse" : "bg-current opacity-40")} />
+                                                    <span className={clsx("w-1 h-1 rounded-full", inv.status === "DIGITIZING" ? "bg-amber-500 animate-pulse" : "bg-current opacity-40")} />
                                                     {inv.status.replace("_", " ")}
                                                 </span>
                                             </td>
-                                            <td className="px-10 py-6 text-right border-l border-slate-50">
+                                            <td className="px-6 py-3 text-right">
                                                 <button
-                                                    type="button"
                                                     onClick={() => { setViewerInvoiceId(inv.id); setViewerLoading(true); }}
-                                                    className="p-2 text-slate-300 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all"
-                                                    title="View document"
+                                                    className="p-1.5 text-slate-300 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all"
+                                                    title="View"
                                                 >
-                                                    <Icon name="ExternalLink" size={18} />
+                                                    <Icon name="Eye" size={16} />
                                                 </button>
                                             </td>
                                         </motion.tr>
@@ -496,7 +442,6 @@ export default function VendorPortal() {
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
 
