@@ -15,6 +15,7 @@ const ValidationForm = ({ invoice: initialInvoice }) => {
   const [invoice, setInvoice] = useState(initialInvoice);
   const [formData, setFormData] = useState({
     vendorName: "",
+    invoiceNumber: "",
     date: "",
     dueDate: "",
     amount: "",
@@ -31,6 +32,7 @@ const ValidationForm = ({ invoice: initialInvoice }) => {
     if (invoice) {
       setFormData({
         vendorName: invoice.vendorName || "",
+        invoiceNumber: invoice.invoiceNumber || "",
         date: invoice.invoiceDate || invoice.date || "",
         dueDate: invoice.dueDate || "",
         amount: invoice.totalAmount || invoice.amount || "",
