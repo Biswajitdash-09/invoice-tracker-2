@@ -35,7 +35,7 @@ const Sidebar = () => {
     try {
       const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
       if (stored !== null) setCollapsed(JSON.parse(stored));
-    } catch (_) {}
+    } catch (_) { }
   }, []);
 
   const toggleSidebar = () => {
@@ -43,7 +43,7 @@ const Sidebar = () => {
       const next = !prev;
       try {
         localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify(next));
-      } catch (_) {}
+      } catch (_) { }
       return next;
     });
   };
@@ -145,17 +145,8 @@ const Sidebar = () => {
           })}
         </nav>
 
-        {/* Logout + Version + Online */}
-        <div className="shrink-0 mt-auto pt-4 border-t border-gray-200/30 space-y-2">
-          <button
-            type="button"
-            onClick={() => { logout(); router.push("/login"); }}
-            className={clsx("w-full flex items-center rounded-xl transition-colors text-gray-500 hover:text-error hover:bg-error/10", collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3")}
-            title="Sign out"
-          >
-            <Icon name="LogOut" size={20} className="shrink-0" />
-            {!collapsed && <span className="truncate">Logout</span>}
-          </button>
+        {/* Version + Online Status */}
+        <div className="shrink-0 mt-auto pt-4 border-t border-gray-200/30">
           <div className={clsx("flex items-center", collapsed ? "justify-center px-0" : "justify-between px-2 gap-2")}>
             {!collapsed && <span className="text-xs font-mono text-gray-400">v{APP_VERSION}</span>}
             <div className="w-2 h-2 rounded-full bg-success/60 animate-pulse shrink-0" title="System Online" />

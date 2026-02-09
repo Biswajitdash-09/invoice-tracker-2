@@ -171,20 +171,22 @@ export default function VendorPortal() {
                 accent="teal"
                 roleLabel="Vendor"
                 actions={
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         <button
                             type="button"
                             onClick={() => { setLoading(true); fetchSubmissions(); }}
-                            className="h-10 px-5 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 text-sm"
+                            className="w-10 h-10 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center"
+                            title="Refresh"
                         >
-                            <Icon name="RefreshCw" size={18} className={loading ? "animate-spin" : ""} /> Refresh
+                            <Icon name="RefreshCw" size={18} className={loading ? "animate-spin" : ""} />
                         </button>
                         <button
                             type="button"
                             onClick={handleDownloadCSV}
-                            className="h-10 px-5 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2 text-sm"
+                            className="w-10 h-10 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center"
+                            title="Export CSV"
                         >
-                            <Icon name="Download" size={18} /> Export CSV
+                            <Icon name="Download" size={18} />
                         </button>
                     </div>
                 }
