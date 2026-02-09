@@ -53,7 +53,10 @@ const FinanceUserDashboard = ({ invoices, onUploadComplete }) => {
                     </div>
                 </Card>
 
-                <Card className="p-5 border-l-4 border-l-success">
+                <Card
+                    className="p-5 border-l-4 border-l-success cursor-pointer transform hover:-translate-y-1 transition-all shadow-sm hover:shadow-md"
+                    onClick={() => router.push('/approvals?status=APPROVED')}
+                >
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Finance Ops</p>

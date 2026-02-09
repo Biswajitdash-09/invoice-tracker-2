@@ -161,7 +161,7 @@ export default function DashboardPage() {
         </button>
         <button
           className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === "analytics" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
-          onClick={() => setActiveTab("analytics")}
+          onClick={() => router.push('/analytics')}
         >
           <Icon name="PieChart" size={13} /> Analytics
         </button>

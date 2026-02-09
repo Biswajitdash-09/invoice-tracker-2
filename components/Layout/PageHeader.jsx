@@ -61,27 +61,38 @@ export default function PageHeader({ title, subtitle, icon = "LayoutDashboard", 
         {actions && <div className="flex items-center gap-2 lg:gap-3 w-full md:w-auto justify-end">{actions}</div>}
 
         {user && (
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-800">{user.name}</p>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize ${badgeClass}`}>
-                {displayRole}
-              </span>
-            </div>
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientClass} shadow-md flex items-center justify-center text-white font-bold uppercase`}>
-              {user.name?.charAt(0) || "U"}
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                logout();
-                router.push("/login");
-              }}
-              className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
-              title="Sign Out"
-            >
-              <Icon name="LogOut" size={18} />
-            </button>
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-slate-800">{user.name}</p>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize ${badgeClass}`}>
+                  {displayRole}
+                </span>
+              </div>
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientClass} shadow-md flex items-center justify-center text-white font-bold uppercase`}>
+                {user.name?.charAt(0) || "U"}
+              </div>
+            </label>
+            <ul tabIndex={0} className="dropdown-content z-50 menu p-3 mt-2 shadow-xl bg-white rounded-2xl w-56 border border-slate-100">
+              <li className="menu-title px-3 py-2 border-b border-slate-100 mb-2">
+                <div>
+                  <p className="font-bold text-slate-800 text-sm">{user.name}</p>
+                  <p className="text-xs text-slate-500">{user.email || `${displayRole}`}</p>
+                </div>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    logout();
+                    router.push("/login");
+                  }}
+                  className="text-sm font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                >
+                  <Icon name="LogOut" size={16} />
+                  Sign Out
+                </button>
+              </li>
+            </ul>
           </div>
         )}
       </div>
