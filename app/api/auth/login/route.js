@@ -54,7 +54,8 @@ export async function POST(request) {
             name: user.name,
             email: user.email,
             role: user.role,
-            vendorId: user.vendorId // Include vendorId for role-based logic
+            vendorId: user.vendorId, // Include vendorId for role-based logic
+            isActive: user.isActive !== false // Default to true unless explicitly set to false
         };
 
         // Start session
