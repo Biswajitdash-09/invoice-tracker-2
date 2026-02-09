@@ -18,30 +18,62 @@ const InvoiceList = ({ invoices }) => {
   // We'll display all, but emphasize those needing action.
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'Approved': return 'bg-success/10 text-success border-success/20';
-      case 'Pending Approval': return 'bg-warning/10 text-warning border-warning/20';
-      case 'Issue Detected':
-      case 'Validation Required': return 'bg-error/10 text-error border-error/20';
-      case 'Processing': return 'bg-info/10 text-info border-info/20';
-      case 'Verified': return 'bg-success/10 text-success border-success/20';
-      case 'Match Discrepancy': return 'bg-error/10 text-error border-error/20';
-      case 'Digitized': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'Digitizing': return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
-      default: return 'bg-gray-100 text-gray-500 border-gray-200';
+    // Normalize status to handle both "VERIFIED" and "Verified"
+    const normalized = status?.toUpperCase() || "";
+
+    switch (normalized) {
+      case 'APPROVED':
+      case 'PAID':
+        return 'bg-success/10 text-success border-success/20'; // Green
+      case 'PENDING_APPROVAL':
+      case 'PENDING APPROVAL':
+        return 'bg-warning/10 text-warning border-warning/20'; // Yellow
+      case 'ISSUE_DETECTED':
+      case 'VALIDATION_REQUIRED':
+      case 'REJECTED':
+        return 'bg-error/10 text-error border-error/20'; // Red
+      case 'PROCESSING':
+        return 'bg-info/10 text-info border-info/20'; // Blue
+      case 'VERIFIED':
+        return 'bg-success/10 text-success border-success/20'; // Green (Requested)
+      case 'MATCH_DISCREPANCY':
+      case 'MATCH DISCREPANCY':
+        return 'bg-orange-50 text-orange-600 border-orange-200'; // Orange (Requested)
+      case 'DIGITIZED':
+        return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'DIGITIZING':
+        return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
+      default:
+        return 'bg-gray-100 text-gray-500 border-gray-200';
     }
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Approved': return 'CheckCircle';
-      case 'Pending Approval': return 'Clock';
-      case 'Issue Detected':
-      case 'Validation Required': return 'AlertCircle';
-      case 'Processing': return 'Loader';
-      case 'Digitized': return 'Check';
-      case 'Digitizing': return 'ScanLine';
-      default: return 'FileText';
+    const normalized = status?.toUpperCase() || "";
+
+    switch (normalized) {
+      case 'APPROVED':
+      case 'PAID':
+        return 'CheckCircle';
+      case 'PENDING_APPROVAL':
+      case 'PENDING APPROVAL':
+        return 'Clock';
+      case 'ISSUE_DETECTED':
+      case 'VALIDATION_REQUIRED':
+      case 'MATCH_DISCREPANCY':
+      case 'MATCH DISCREPANCY':
+        return 'AlertTriangle';
+      case 'REJECTED':
+        return 'XCircle';
+      case 'PROCESSING':
+        return 'Loader';
+      case 'DIGITIZED':
+      case 'VERIFIED':
+        return 'Check';
+      case 'DIGITIZING':
+        return 'ScanLine';
+      default:
+        return 'FileText';
     }
   };
 
@@ -85,7 +117,9 @@ const InvoiceList = ({ invoices }) => {
 
             {/* Amount */}
             <div className="col-span-4 md:col-span-2 text-right font-bold text-gray-700">
-              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(invoice.amount)}
+              {isNaN(Number(invoice.amount)) || !invoice.amount
+                ? '₹0.00'
+                : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(invoice.amount)}
             </div>
 
             {/* Status */}

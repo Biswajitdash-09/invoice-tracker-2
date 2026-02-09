@@ -186,14 +186,14 @@ export default function DashboardPage() {
           <label tabIndex={0} className="h-10 w-10 flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 hover:text-indigo-600 hover:border-indigo-200 transition-all cursor-pointer">
             <Icon name="Filter" size={16} />
           </label>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow-xl bg-white rounded-2xl w-56 border border-slate-100 mt-2">
+          <ul tabIndex={0} className="dropdown-content z-50 menu p-2 shadow-xl bg-white rounded-2xl w-56 border border-slate-100 mt-2">
             <div className="px-4 py-2 border-b border-slate-50 mb-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filter by Status</p>
             </div>
             <li><a onClick={() => setStatusFilter("ALL")} className="text-xs font-bold text-slate-600 py-2">All Invoices</a></li>
             <li><a onClick={() => setStatusFilter("PENDING_APPROVAL")} className="text-xs font-bold text-amber-600 py-2">Pending Approval</a></li>
             <li><a onClick={() => setStatusFilter("PAID")} className="text-xs font-bold text-emerald-600 py-2">Paid</a></li>
-            <li><a onClick={() => setStatusFilter("MATCH_DISCREPANCY")} className="text-xs font-bold text-rose-600 py-2">Discrepancies</a></li>
+            <li><a onClick={() => setStatusFilter("MATCH_DISCREPANCY")} className="text-xs font-bold text-orange-600 py-2">Discrepancies</a></li>
           </ul>
         </div>
       </div>
@@ -248,7 +248,7 @@ export default function DashboardPage() {
                   title="Discrepancies"
                   value={stats.discrepancyCount}
                   icon="AlertCircle"
-                  color="error"
+                  color="orange"
                 />
                 <StatCard
                   title="Verified"
@@ -325,32 +325,32 @@ export default function DashboardPage() {
         </>
       )}
       {/* Global Upload Modal */}
-      <dialog id="upload_modal" className={`modal ${isUploadModalOpen ? 'modal-open' : ''}`}>
-        <div className="modal-box max-w-2xl bg-white p-0 overflow-hidden rounded-3xl shadow-2xl border border-gray-100">
-          <div className="p-6 border-b bg-gray-50 flex justify-between items-center">
+      <dialog id="upload_modal" className={`modal ${isUploadModalOpen ? 'modal-open' : ''} modal-bottom sm:modal-middle`}>
+        <div className="modal-box w-full max-w-2xl bg-white p-0 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-gray-100 max-h-[85vh] flex flex-col">
+          <div className="p-6 border-b bg-gray-50 flex justify-between items-center shrink-0">
             <div>
-              <h3 className="font-black text-xl text-gray-800 uppercase tracking-tight">Submit New Invoices</h3>
-              <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-wider text-primary">Secure ERP Ingestion Portal</p>
+              <h3 className="font-black text-lg sm:text-xl text-gray-800 uppercase tracking-tight">Submit New Invoices</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1 uppercase font-bold tracking-wider text-primary">Secure ERP Ingestion Portal</p>
             </div>
             <button
               onClick={() => setIsUploadModalOpen(false)}
               className="btn btn-sm btn-circle btn-ghost"
             >✕</button>
           </div>
-          <div className="p-10 bg-white">
+          <div className="p-6 sm:p-10 bg-white overflow-y-auto custom-scrollbar">
             <DropZone onUploadComplete={() => {
               fetchData();
               setIsUploadModalOpen(false);
             }} />
           </div>
-          <div className="p-4 bg-gray-50 border-t flex justify-end gap-3 px-6">
+          <div className="p-4 bg-gray-50 border-t flex justify-end gap-3 px-6 shrink-0">
             <button
               onClick={() => setIsUploadModalOpen(false)}
-              className="btn btn-ghost rounded-full px-8 text-xs font-bold uppercase"
-            >Cancel Submission</button>
+              className="btn btn-ghost rounded-full px-4 sm:px-8 text-xs font-bold uppercase"
+            >Cancel</button>
             <button
               onClick={() => setIsUploadModalOpen(false)}
-              className="btn btn-primary rounded-full px-10 shadow-lg shadow-primary/20 text-xs font-bold uppercase"
+              className="btn btn-primary rounded-full px-6 sm:px-10 shadow-lg shadow-primary/20 text-xs font-bold uppercase"
             >
               Done
             </button>

@@ -6,13 +6,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import Icon from "@/components/Icon";
 import { ingestInvoice } from "@/lib/api";
 
-const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
+const DropZone = ({ onUploadComplete, uploadMetadata = {}, theme = "light" }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const progressCancelRef = useRef(false);
 
+  // ... (keep existing logic) ...
   const onDrop = useCallback(async (acceptedFiles) => {
+    // ... (logic is same)
     if (acceptedFiles.length === 0) return;
 
     setIsUploading(true);
@@ -88,15 +90,20 @@ const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
     noClick: false // Allow click on container
   });
 
+  const isDark = theme === "dark";
+
   return (
-    <div className="w-full h-full min-h-[300px]">
+    <div className="w-full h-full min-h-[200px] sm:min-h-[300px]">
       <div
         {...getRootProps()}
         className={`
-          relative w-full h-full rounded-3xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-8
+          relative w-full h-full rounded-3xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-6 sm:p-8
           ${isDragActive
             ? "border-primary bg-primary/5 shadow-inner scale-[0.99]"
-            : "border-gray-300 hover:border-primary/50 hover:bg-white/40 bg-white/20"}
+            : isDark
+              ? "border-white/20 hover:border-white/40 hover:bg-white/10 bg-white/5"
+              : "border-gray-300 hover:border-primary/50 hover:bg-white/40 bg-white/20"
+          }
           ${isDragReject ? "border-error bg-error/5" : ""}
           backdrop-blur-sm cursor-pointer overflow-hidden group
         `}
@@ -121,15 +128,15 @@ const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
                   >
                     <Icon name="Check" size={40} className="text-success" />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-gray-700">Uploaded!</h3>
-                  <p className="text-gray-500">Processing your invoices...</p>
+                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-700'}`}>Uploaded!</h3>
+                  <p className={isDark ? 'text-indigo-200' : 'text-gray-500'}>Processing your invoices...</p>
                 </div>
               ) : (
                 <div className="w-full max-w-xs text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto animate-pulse">
                     <Icon name="UploadCloud" size={32} className="text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Uploading Files...</h3>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>Uploading Files...</h3>
                   <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-primary rounded-full"
@@ -138,7 +145,7 @@ const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
                       transition={{ type: "tween", duration: 0.35 }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">{Math.min(100, Math.round(uploadProgress))}%</p>
+                  <p className={`text-xs mt-2 ${isDark ? 'text-indigo-200' : 'text-gray-500'}`}>{Math.min(100, Math.round(uploadProgress))}%</p>
                 </div>
               )}
             </motion.div>
@@ -152,21 +159,26 @@ const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
             >
               <div className={`
                 w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center transition-colors duration-300
-                ${isDragActive ? "bg-primary text-white shadow-xl shadow-primary/30" : "bg-white/60 text-primary shadow-lg"}
+                ${isDragActive
+                  ? "bg-primary text-white shadow-xl shadow-primary/30"
+                  : isDark
+                    ? "bg-white/10 text-white shadow-lg"
+                    : "bg-white/60 text-primary shadow-lg"
+                }
               `}>
                 <Icon name="Upload" size={36} className={isDragActive ? "animate-bounce" : ""} />
               </div>
 
-              <h3 className="text-2xl font-bold text-gray-700 mb-2">
+              <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
                 {isDragActive ? "Drop files here" : "Upload Invoices"}
               </h3>
-              <p className="text-gray-500 mb-6 max-w-xs mx-auto">
+              <p className={`mb-6 max-w-xs mx-auto ${isDark ? 'text-indigo-100' : 'text-gray-500'}`}>
                 Drag & drop your invoices here, or click to browse files.
                 <br />
                 <span className="text-xs opacity-70">(PDF, Word, Excel, JPG, PNG supported)</span>
               </p>
 
-              <button type="button" className="btn btn-outline btn-primary rounded-full px-8 border-2 font-bold hover:scale-105 transition-transform">
+              <button type="button" className={`btn rounded-full px-8 border-2 font-bold hover:scale-105 transition-transform ${isDark ? 'btn-white text-indigo-600 hover:bg-white/90 border-transparent' : 'btn-outline btn-primary'}`}>
                 Browse Files
               </button>
             </motion.div>
@@ -176,10 +188,10 @@ const DropZone = ({ onUploadComplete, uploadMetadata = {} }) => {
         {/* Decorative elements inside dropzone */}
         {!isUploading && (
           <>
-            <div className="absolute top-10 left-10 text-gray-300 rotate-12 pointer-events-none group-hover:scale-110 transition-transform">
+            <div className={`absolute top-10 left-10 rotate-12 pointer-events-none group-hover:scale-110 transition-transform ${isDark ? 'text-white/10' : 'text-gray-300'}`}>
               <Icon name="FileText" size={48} />
             </div>
-            <div className="absolute bottom-10 right-10 text-gray-300 -rotate-12 pointer-events-none group-hover:scale-110 transition-transform">
+            <div className={`absolute bottom-10 right-10 -rotate-12 pointer-events-none group-hover:scale-110 transition-transform ${isDark ? 'text-white/10' : 'text-gray-300'}`}>
               <Icon name="Image" size={48} />
             </div>
           </>

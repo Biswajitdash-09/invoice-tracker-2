@@ -93,19 +93,19 @@ function DigitizationPageContent() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 flex flex-col">
           <span className="text-xs font-bold uppercase opacity-70">To Digitize</span>
-          <span className="text-2xl font-bold">{allInvoices.filter(i => i.status === 'RECEIVED' || i.status === 'DIGITIZING').length}</span>
+          <span className="text-2xl font-bold text-purple-700">{allInvoices.filter(i => ['RECEIVED', 'DIGITIZING', 'UPLOADED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
         <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 flex flex-col">
           <span className="text-xs font-bold uppercase opacity-70">Processing</span>
-          <span className="text-2xl font-bold">{allInvoices.filter(i => i.status === 'VERIFIED' || i.status === 'MATCH_DISCREPANCY').length}</span>
+          <span className="text-2xl font-bold text-blue-700">{allInvoices.filter(i => ['VERIFIED', 'MATCH_DISCREPANCY', 'VALIDATION_REQUIRED', 'ISSUE_DETECTED', 'DIGITIZED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
         <div className="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 flex flex-col">
           <span className="text-xs font-bold uppercase opacity-70">Pending Approval</span>
-          <span className="text-2xl font-bold">{allInvoices.filter(i => i.status === 'PENDING_APPROVAL').length}</span>
+          <span className="text-2xl font-bold text-orange-700">{allInvoices.filter(i => ['PENDING_APPROVAL', 'PENDING APPROVAL'].includes(i.status?.toUpperCase())).length}</span>
         </div>
         <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 flex flex-col">
           <span className="text-xs font-bold uppercase opacity-70">Completed Today</span>
-          <span className="text-2xl font-bold">{allInvoices.filter(i => i.status === 'PAID' || i.status === 'APPROVED').length}</span>
+          <span className="text-2xl font-bold text-green-700">{allInvoices.filter(i => ['PAID', 'APPROVED', 'VERIFIED'].includes(i.status?.toUpperCase())).length}</span>
         </div>
       </div>
 
